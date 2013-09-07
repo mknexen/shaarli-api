@@ -31,7 +31,11 @@ class CronController {
 		$this->verbose( 'Fetching: ' . $feed->url );
 
 		// Execute http request
-		$xml = file_get_contents( $feed->url );
+		$xml = $this->makeRequest( $feed->url );
+
+		if( empty($xml) ) {
+			return; // skip
+		}
 
 		// Parsing feed
 		$simplepie = new SimplePie();
@@ -64,6 +68,26 @@ class CronController {
 
 		$feed->fetched();
 		$feed->save();
+	}
+
+	/**
+	 * Make http request and return html content
+	 */
+	private function makeRequest( $url ) {
+
+		$options = array(
+		  'http' => array(
+		    'method' => "GET",
+		    'header' => "Accept-language: fr\r\n" .
+		              "User-Agent: shaarli-api\r\n"
+		  )
+		);
+
+		$context = stream_context_create($options);
+
+		$content = @file_get_contents($url, false, $context);
+
+		return $content;
 	}
 
 	/**

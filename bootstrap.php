@@ -2,7 +2,7 @@
 
 /**
  * Shaarli REST API
- * @version devel
+ * @version 1.0 alpha
  * @authors:
  * 	nexen (nexen@dukgo.com, nexen@irc.freenode.net, http://nexen.mkdir.fr/shaarli)
  */
@@ -21,5 +21,5 @@ require_once __DIR__ . '/models/models.php';
 
 // mysql
 ORM::configure('mysql:host=localhost;dbname=shaarli-api');
-ORM::configure('username', 'root');
-ORM::configure('password', '');
+ORM::configure('username', 'shaarli-api');
+ORM::configure('password', 'shaarli-api');

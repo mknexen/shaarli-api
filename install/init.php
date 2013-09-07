@@ -11,6 +11,7 @@ function get_shaarlis_list() {
 
     $shaarli_list=array();
 
+    // Code from Oros, thanks
     $body =file_get_contents("https://ecirtam.net/shaarlirss/custom/people.opml");
 
     if(!empty($body)) {

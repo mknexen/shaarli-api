@@ -3,26 +3,57 @@
 class ApiController {
 
 	/**
-	 * Parsing request
+	 * Parsing request and execute the action
 	 */
 	public function route() {
 
-		// TODO
-		// Need good regex to parse request uri
+		// $uri = trim($_SERVER['REQUEST_URI'], '/');
 
-		$action = 'feeds';
-		$format = 'json';
-		$arguments = array();
+		$action = trim($_SERVER['PATH_INFO'], '/'); // secure?
 
-		$data = $this->$action();
+		// Les actions disponible
+		$actions = array(
+			'feeds',
+			'lastest',
+			'top',
+			'search',
+		);
 
+		if( !in_array($action, $actions) ) {
+
+			// TODO http code?
+			die('Incorrect request');
+		}
+
+		// Les formats disponibles
+		$formats = array(
+			'json',
+		);
+
+		// Default format: json
+		$format = (isset($_GET['format']) && in_array($_GET['format'], $formats)) ? $_GET['format']: 'json';
+
+		$arguments = $_GET;
+
+		// Execute the action
+		$results = $this->$action( $arguments );
+
+		// Render results
 		if( $format == 'json' ) {
 
 			header('Cache-Control: no-cache, must-revalidate');
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 			header('Content-type: application/json');
 
-			echo json_encode($data);
+			// Petty JSON
+			if( isset($_GET['pretty']) && $_GET['pretty'] == 1 ) {
+
+				echo json_encode($results, JSON_PRETTY_PRINT);
+			}
+			else {
+
+				echo json_encode($results);				
+			}
 		}
 	}
 
@@ -46,11 +77,24 @@ class ApiController {
 	 */
 	public function lastest() {
 
-		$entries = Entry::factory()
-					->select_expr('id, date, permalink, title, content')
+		$entries = Feed::factory()
+					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.title AS feed_title, entries.id, date, permalink, entries.title, content')
+					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
 					->order_by_desc('date')
 					->limit(50)
 					->findArray();
+
+		if( $entries != null ) {
+
+			foreach( $entries as &$entry ) {
+
+				$entry['feed']['id'] = $entry['feed_id'];
+				$entry['feed']['url'] = $entry['feed_url'];
+				$entry['feed']['title'] = $entry['feed_title'];
+
+				unset($entry['feed_id'], $entry['feed_url'], $entry['feed_title']);
+			}
+		}
 
 		return $entries;
 	}
@@ -60,7 +104,7 @@ class ApiController {
 	 * @route /top
 	 * @args interval={interval}
 	 */
-	public function top() {
+	public function top( $arguments ) {
 
 		$intervals = array(
 			'12h',
@@ -70,9 +114,38 @@ class ApiController {
 			'alltime',
 		);
 
-		// TODO
+		if( isset($arguments['interval']) && in_array($arguments['interval'], $intervals)) {
 
-		return array();
+			$entries = Entry::factory()
+					->select_expr('permalink, entries.title, COUNT(1) AS count')
+					->order_by_desc('count')
+					->group_by('permalink')
+					->having_gt('count', 1);
+
+			switch ($arguments['interval']) {
+				case '12h':					
+					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -12 HOUR)');
+					break;
+				case '24h':					
+					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -24 HOUR)');
+					break;
+				case '48h':
+					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -48 HOUR)');
+					break;
+				case '1month':					
+					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
+					break;
+				case '3month':					
+					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
+					break;
+			}
+
+			return $entries->findArray();		
+		}
+		else {
+
+			die('Invalid interval');
+		}
 	}
 
 	/**
@@ -80,9 +153,21 @@ class ApiController {
 	 * @route /search
 	 * @args q={searchterm}
 	 */
-	public function search() {
+	public function search( $arguments ) {
 
-		// TODO
+		if( isset($arguments['q']) && !empty($arguments['q']) ) {
+
+			$term = '%' . $arguments['q'] . '%';
+
+			$entries = Entry::factory()
+					->select_expr('id, date, permalink, title, content')
+					// ->where_like('title', $term)
+					->where_raw('(`title` LIKE ? OR `content` LIKE ?)', array($term, $term)) // security: possible injection?
+					->order_by_desc('date')
+					->findArray();
+
+			return $entries;
+		}
 
 		return array();
 	}

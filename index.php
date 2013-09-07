@@ -16,7 +16,7 @@ class ApiController {
 		// Les actions disponible
 		$actions = array(
 			'feeds',
-			'lastest',
+			'latest',
 			'top',
 			'search',
 		);
@@ -77,7 +77,7 @@ class ApiController {
 	 * Feeds list
 	 * @route /feeds
 	 */
-	public function feeds() {
+	protected function feeds() {
 
 		$feeds = Feed::factory()
 					->select_expr('id, url, title')
@@ -88,10 +88,10 @@ class ApiController {
 	}
 
 	/**
-	 * Lastest entries
-	 * @route /lastest
+	 * Latest entries
+	 * @route /latest
 	 */
-	public function lastest() {
+	protected function latest() {
 
 		$entries = Feed::factory()
 					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.title AS feed_title, entries.id, date, permalink, entries.title, content')
@@ -120,7 +120,7 @@ class ApiController {
 	 * @route /top
 	 * @args interval={interval}
 	 */
-	public function top( $arguments ) {
+	protected function top( $arguments ) {
 
 		$intervals = array(
 			'12h',
@@ -170,7 +170,7 @@ class ApiController {
 	 * @route /search
 	 * @args q={searchterm}
 	 */
-	public function search( $arguments ) {
+	protected function search( $arguments ) {
 
 		if( isset($arguments['q']) && !empty($arguments['q']) ) {
 

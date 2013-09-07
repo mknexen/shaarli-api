@@ -26,7 +26,7 @@ class CronController {
 	 * Fetch single feed
 	 * @param Feed feed
 	 */
-	public function fetch( Feed $feed ) {
+	protected function fetch( Feed $feed ) {
 
 		$this->verbose( 'Fetching: ' . $feed->url );
 
@@ -73,7 +73,7 @@ class CronController {
 	/**
 	 * Make http request and return html content
 	 */
-	private function makeRequest( $url ) {
+	protected function makeRequest( $url ) {
 
 		$options = array(
 		  'http' => array(
@@ -94,7 +94,7 @@ class CronController {
 	 * Verbose
 	 * @param string str
 	 */
-	public function verbose( $str ) {
+	protected function verbose( $str ) {
 
 		echo implode("\t", array(
 			date('d/m/Y H:i:s'),

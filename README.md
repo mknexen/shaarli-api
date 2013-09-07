@@ -11,7 +11,7 @@ Shaarli REST API
 
 ### API Usage
 * /feeds La liste des shaarlis
-* /lastest Les derniers billets
+* /latest Les derniers billets
 * /top Les liens les plus partagés
 * /search Rechercher dans les billets
 

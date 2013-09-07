@@ -11,6 +11,8 @@ class ApiController {
 
 		$action = trim($_SERVER['PATH_INFO'], '/'); // secure?
 
+		$method = $_SERVER['REQUEST_METHOD'];
+
 		// Les actions disponible
 		$actions = array(
 			'feeds',
@@ -21,8 +23,7 @@ class ApiController {
 
 		if( !in_array($action, $actions) ) {
 
-			// TODO http code?
-			die('Incorrect request');
+			$this->error('Bad request (invalid action)');
 		}
 
 		// Les formats disponibles
@@ -55,6 +56,21 @@ class ApiController {
 				echo json_encode($results);				
 			}
 		}
+
+		exit();
+	}
+
+	/**
+	 * Send error message
+	 * @param string message
+	 * @param int http_code
+	 */
+	protected function error( $message, $http_code ) {
+
+		// TODO use good http code
+
+		echo json_encode(array('error' => $message));
+		exit();
 	}
 
 	/**
@@ -109,6 +125,7 @@ class ApiController {
 		$intervals = array(
 			'12h',
 			'24h',
+			'48h',
 			'1month',
 			'3month',
 			'alltime',
@@ -144,7 +161,7 @@ class ApiController {
 		}
 		else {
 
-			die('Invalid interval');
+			$this->error('Invalid interval (?interval={' . implode('|', $intervals) . '})');
 		}
 	}
 
@@ -168,8 +185,10 @@ class ApiController {
 
 			return $entries;
 		}
+		else {
 
-		return array();
+			$this->error('Need search term (?q=searchterm)');
+		}
 	}
 }
 

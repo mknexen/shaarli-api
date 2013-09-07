@@ -1,0 +1,7 @@
+Options +FollowSymLinks
+
+RewriteEngine On
+RewriteBase /shaarli-api/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /shaarli-api/index.php/$1 [L]

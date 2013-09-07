@@ -1,17 +1,33 @@
 <?php
 
-class ApiController {
+abstract class AbstractApi {
+
+	/**
+	 * Get requested action
+	 */
+	public function getRequestAction() {
+
+		if( isset($_SERVER['PATH_INFO']) ) {
+
+			$action = trim($_SERVER['PATH_INFO'], '/'); // secure?
+			return $action;
+		}
+	}
+
+	/**
+	 * Get requested method
+	 */
+	public function getRequestMethod() {
+		return isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+	}
+}
+
+class ApiController extends AbstractApi {
 
 	/**
 	 * Parsing request and execute the action
 	 */
 	public function route() {
-
-		// $uri = trim($_SERVER['REQUEST_URI'], '/');
-
-		$action = trim($_SERVER['PATH_INFO'], '/'); // secure?
-
-		$method = $_SERVER['REQUEST_METHOD'];
 
 		// Les actions disponible
 		$actions = array(
@@ -19,7 +35,10 @@ class ApiController {
 			'latest',
 			'top',
 			'search',
+			'syncfeeds',
 		);
+
+		$action = $this->getRequestAction();
 
 		if( !in_array($action, $actions) ) {
 
@@ -65,7 +84,7 @@ class ApiController {
 	 * @param string message
 	 * @param int http_code
 	 */
-	protected function error( $message, $http_code ) {
+	protected function error( $message, $http_code = null ) {
 
 		// TODO use good http code
 
@@ -188,6 +207,93 @@ class ApiController {
 		else {
 
 			$this->error('Need search term (?q=searchterm)');
+		}
+	}
+
+	/**
+	 * Sync feeds list with other API nodes
+	 */
+	protected function syncfeeds() {
+
+		// Shaarli API Nodes list
+		$nodes = array(
+			'http://nexen.mkdir.fr/shaarli-api/feeds',
+		);
+
+		foreach( $nodes as $node ) {
+
+			$content = file_get_contents($node);
+			$feeds = json_decode($content);
+
+			if( !empty($feeds) ) {
+
+				foreach( $feeds as $feed ) {
+
+					if( isset($feed->url) ) {
+
+						$feed = Feed::create();
+						$feed->url = $feed->url;
+
+						try {	
+
+							$feed->save();
+
+						} catch (Exception $e) {
+							
+							// feed already exist
+						}
+					}
+				}
+			}
+		}
+
+		$this->syncWithOrosOpml();
+
+		return array('success' => 1);
+	}
+
+	/**
+	 * Sync with Oros OPML file (thanks bro)
+	 */
+	private function syncWithOrosOpml() {
+
+		// récupération de la liste des shaarlis
+		function get_shaarlis_list() {
+
+		    $shaarli_list=array();
+
+		    // Code from Oros, another thanks!
+		    $body = file_get_contents("https://ecirtam.net/shaarlirss/custom/people.opml");
+
+		    if(!empty($body)) {
+
+			    $xml = @simplexml_load_string($body);
+
+			    foreach ($xml->body->outline as $value) {
+
+			        $attributes = $value->attributes();
+			        $shaarli_list[] = $attributes->xmlUrl;
+			    }
+		    }
+
+		    return $shaarli_list;       
+		}
+
+		$urls = get_shaarlis_list();
+
+		foreach( $urls as $url ) {
+
+			$feed = Feed::create();
+			$feed->url = $url;
+
+			try {	
+
+				$feed->save();
+
+			} catch (Exception $e) {
+				
+				// feed already exist
+			}
 		}
 	}
 }

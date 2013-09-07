@@ -6,7 +6,8 @@ Shaarli REST API
 * Install database schema /database/mysql_schema.sql
 * Set database connection string in /bootstrap.php
 * Set write permission on cache directory
-* Init feed table with /install/init.php
+* Enable Apache RewriteEngine
+* Initialize feed list with api action /syncfeeds
 * Set cronjob: php cron.php
 
 ### API Usage
@@ -14,6 +15,8 @@ Shaarli REST API
 * /latest Les derniers billets
 * /top Les liens les plus partagés
 * /search Rechercher dans les billets
+*
+* /syncfeeds Synchroniser la liste des shaarlis
 
 ### Options
 * &format=json

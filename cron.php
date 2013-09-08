@@ -26,14 +26,52 @@ class CronController {
 	 * Fetch single feed
 	 * @param Feed feed
 	 */
-	protected function fetch( Feed $feed ) {
+	public function fetch( Feed $feed ) {
 
 		$this->verbose( 'Fetching: ' . $feed->url );
 
-		// Execute http request
-		$xml = $this->makeRequest( $feed->url );
+		// Check HTTPS capability
+		if( $feed->https == null ) {
 
-		if( empty($xml) ) {
+			$this->verbose( 'Checking HTTPS capability: ' . $feed->url );
+
+			$url = preg_replace("/^http:/", "https:", $feed->url);
+
+			$request = $this->makeRequest( $url );
+
+			if( $request['info']['http_code'] == 200 ) {
+
+				$feed->https = 1;
+				$feed->url = $url;	
+			}
+			else {
+
+				$feed->https = 0;
+				$feed->url = preg_replace("/^https:/", "http:", $feed->url);
+			}
+
+			unset($request);
+		}
+
+		// Execute HTTP Request
+		$request = $this->makeRequest( $feed->url );
+
+		if( $request['info']['http_code'] != 200 ) {
+
+			$feed->title = '[ERROR HTTP CODE ' . $request['info']['http_code'] . ']';
+			$feed->save();
+
+			$this->verbose( 'Error Fetching: ' . $feed->url );
+
+			return; // skip
+		}
+		if( empty($request['html']) ) {
+
+			$feed->title = '[ERROR SERVER RETURN EMPTY CONTENT]';
+			$feed->save();
+
+			$this->verbose( 'Error Fetching: ' . $feed->url );
+
 			return; // skip
 		}
 
@@ -41,15 +79,26 @@ class CronController {
 		$simplepie = new SimplePie();
 		// $simplepie->set_cache_location( __DIR__ . '/cache/simplepie/' );
 
-		$simplepie->set_raw_data( $xml );
+		$simplepie->set_raw_data( $request['html'] );
 
-		$simplepie->init();
-		// $feed->handle_content_type();
+		$success = $simplepie->init();
+
+		if( $success === false ) {
+
+			$feed->title = '[ERROR PARSING FEED]';
+			$feed->save();
+
+			$this->verbose( 'Error parsing: ' . $feed->url );
+
+			return; // skip
+		}
 
 		$feed->title = $simplepie->get_title();
 		$feed->link = $simplepie->get_link();
 
-		foreach($simplepie->get_items() as $item) {
+		$items = $simplepie->get_items();
+
+		foreach($items as $item) {
 
 			$entry = Entry::create();
 
@@ -92,24 +141,47 @@ class CronController {
 	/**
 	 * Make http request and return html content
 	 */
-	protected function makeRequest( $url ) {
+	public function makeRequest( $url ) {
 
-		$options = array(
-		  'http' => array(
-		    'method' => "GET",
-		    'header' => "Accept-language: fr\r\n" .
-		              "User-Agent: shaarli-api\r\n"
-		  )
-		);
+		if( function_exists('curl_init') ) {
 
-		$context = stream_context_create($options);
+			$ch = curl_init();
 
-		// TODO search for HTTPS capability
-		// TODO get returned http code
+			$options = array(
+				CURLOPT_URL => $url,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HEADER => false,
+				CURLOPT_AUTOREFERER => false,
+				CURLOPT_FOLLOWLOCATION => true,
+				CURLOPT_MAXREDIRS => 5,
+				CURLOPT_CONNECTTIMEOUT => 15,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_SSL_VERIFYPEER => false,
+				CURLOPT_REFERER => '',
+				CURLOPT_ENCODING => 'gzip',
+				CURLOPT_USERAGENT => 'shaarli-api',
+				CURLOPT_HTTPHEADER => array(
+					'User-Agent: shaarli-api',
+					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+					'Accept-Language: en-US,en;q=0.5',
+					'Accept-Encoding: gzip, deflate',
+					'DNT: 1',
+					'Connection: keep-alive',
+				),
+			);
 
-		$content = @file_get_contents($url, false, $context);
+			curl_setopt_array($ch, $options);
 
-		return $content;
+			$html = curl_exec($ch);
+			$error = curl_error($ch);
+			$errno = curl_errno($ch);
+			$info = curl_getinfo($ch);
+
+			return compact('html', 'error', 'errno', 'info');
+		}
+		else {
+			throw new Exception("php-curl is required", 1);
+		}
 	}
 
 	/**

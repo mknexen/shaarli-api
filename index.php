@@ -121,12 +121,11 @@ class ApiController extends AbstractApi {
 		// Full list
 		if( isset($arguments['full']) && $arguments['full'] == 1 ) {
 
-			$feeds->select_expr('fetched_at, enabled');
+			$feeds->select_expr('https, enabled, fetched_at, created_at');
 		}
 		else { // Active feeds
 
-			$feeds->where_not_null('title');
-			$feeds->where_raw('title != \'\'');
+			$feeds->where_not_null('link');
 			$feeds->where('enabled', 1);
 		}
 

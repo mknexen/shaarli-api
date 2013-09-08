@@ -67,6 +67,9 @@ class Feed extends ModelBase {
 				$http = preg_replace("/^https:/", "http:", $url);
 				$https = $url;
 			}
+			else {
+				throw new Exception("Bad scheme", 1);
+			}
 
 			$count = self::factory()
 				->where_raw('url = ? OR url = ? OR url LIKE ?', array($http, $https, '%' . $parts['host'] . '%')) // Retrict one shaarli per domain to avoid malformed urls => TODO: format url correctly
@@ -77,6 +80,15 @@ class Feed extends ModelBase {
 		else {
 			throw new Exception("empty url", 1);
 		}
+	}
+
+	/**
+	 * Find one feed by this id
+	 * @param int id
+	 */
+	public static function findById( $id ) {
+
+		return self::factory()->find_one($id);
 	}
 }
 

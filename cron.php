@@ -33,24 +33,7 @@ class CronController {
 		// Check HTTPS capability
 		if( $feed->https == null ) {
 
-			$this->verbose( 'Checking HTTPS capability: ' . $feed->url );
-
-			$url = preg_replace("/^http:/", "https:", $feed->url);
-
-			$request = $this->makeRequest( $url );
-
-			if( $request['info']['http_code'] == 200 ) {
-
-				$feed->https = 1;
-				$feed->url = $url;	
-			}
-			else {
-
-				$feed->https = 0;
-				$feed->url = preg_replace("/^https:/", "http:", $feed->url);
-			}
-
-			unset($request);
+			$this->checkHttpsCapability( $feed );
 		}
 
 		// Execute HTTP Request
@@ -59,6 +42,7 @@ class CronController {
 		if( $request['info']['http_code'] != 200 ) {
 
 			$feed->title = '[ERROR HTTP CODE ' . $request['info']['http_code'] . ']';
+			$feed->link = null;
 			$feed->save();
 
 			$this->verbose( 'Error Fetching: ' . $feed->url );
@@ -68,6 +52,7 @@ class CronController {
 		if( empty($request['html']) ) {
 
 			$feed->title = '[ERROR SERVER RETURN EMPTY CONTENT]';
+			$feed->link = null;
 			$feed->save();
 
 			$this->verbose( 'Error Fetching: ' . $feed->url );
@@ -86,6 +71,7 @@ class CronController {
 		if( $success === false ) {
 
 			$feed->title = '[ERROR PARSING FEED]';
+			$feed->link = null;
 			$feed->save();
 
 			$this->verbose( 'Error parsing: ' . $feed->url );
@@ -139,6 +125,51 @@ class CronController {
 	}
 
 	/**
+	 * Check HTTPS capability
+	 * @param Feed feed
+	 */
+	public function checkHttpsCapability( Feed $feed ) {
+
+		$this->verbose( 'Checking HTTPS capability: ' . $feed->url );
+
+		$url = preg_replace("/^http:/", "https:", $feed->url);
+
+		$request = $this->makeRequest( $url );
+
+		$https_capable = false;
+
+		if( $request['info']['http_code'] == 200 ) {
+
+			$simplepie = new SimplePie();
+			$simplepie->set_raw_data( $request['html'] );
+			$success = $simplepie->init();
+
+			if( $success !== false ) {
+
+				$https_capable = true;
+			}
+			else {
+				// Capable but unable to parse feed, maybe shaarli only served on port 80
+			}
+		}
+
+		if( $https_capable ) {
+
+			$feed->https = 1;
+			$feed->url = $url;
+		}
+		else {
+
+			$feed->https = 0;
+			$feed->url = preg_replace("/^https:/", "http:", $feed->url);			
+		}
+
+		$feed->save();
+
+		unset($request);
+	}
+
+	/**
 	 * Make http request and return html content
 	 */
 	public function makeRequest( $url ) {
@@ -157,11 +188,9 @@ class CronController {
 				CURLOPT_CONNECTTIMEOUT => 15,
 				CURLOPT_TIMEOUT => 30,
 				CURLOPT_SSL_VERIFYPEER => false,
-				CURLOPT_REFERER => '',
 				CURLOPT_ENCODING => 'gzip',
-				CURLOPT_USERAGENT => 'shaarli-api',
 				CURLOPT_HTTPHEADER => array(
-					'User-Agent: shaarli-api',
+					'User-Agent: Shaarli-aAPI (Mozilla Firefox)',
 					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 					'Accept-Language: en-US,en;q=0.5',
 					'Accept-Encoding: gzip, deflate',

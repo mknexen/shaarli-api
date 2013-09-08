@@ -28,10 +28,55 @@ class Feed extends ModelBase {
 	public static $_table = 'feeds';
 
 	/**
+	 * Url setter
+	 */
+	public function setUrl( $url ) {
+
+		$url = trim($url);
+		// $url = str_replace('//', '/', $url);
+
+		$this->url = $url;
+	}
+
+	/**
 	 * Set feed as fetched
 	 */
 	public function fetched() {
 		$this->set_expr('fetched_at', 'NOW()');
+	}
+
+	/**
+	 * Check if feed already exist
+	 * @return bool
+	 */
+	public function exists( $config = array() ) {
+
+		$url = $this->url = trim($this->url);
+
+		if( !empty($url) ) {
+
+			$parts = parse_url( $url );
+
+			if( $parts['scheme'] == 'http' ) {
+
+				$http = $url;
+				$https = $url = preg_replace("/^http:/", "https:", $url);
+			}
+			elseif( $parts['scheme'] == 'https' ) {
+
+				$http = preg_replace("/^https:/", "http:", $url);
+				$https = $url;
+			}
+
+			$count = self::factory()
+				->where_raw('url = ? OR url = ? OR url LIKE ?', array($http, $https, '%' . $parts['host'] . '%')) // Retrict one shaarli per domain to avoid malformed urls => TODO: format url correctly
+				->count();
+
+			return $count > 0;
+		}
+		else {
+			throw new Exception("empty url", 1);
+		}
 	}
 }
 

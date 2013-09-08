@@ -104,6 +104,9 @@ class CronController {
 
 		$context = stream_context_create($options);
 
+		// TODO search for HTTPS capability
+		// TODO get returned http code
+
 		$content = @file_get_contents($url, false, $context);
 
 		return $content;

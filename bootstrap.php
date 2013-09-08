@@ -4,7 +4,7 @@
  * Shaarli REST API
  * @version 1.0 alpha
  * @authors:
- * 	nexen (nexen@dukgo.com, nexen@irc.freenode.net, http://nexen.mkdir.fr/shaarli)
+ * 	nexen (nexen@dukgo.com, nexen@irc.freenode.net#debian, https://nexen.mkdir.fr/shaarli)
  */
 
 require_once __DIR__ . '/vendor/idiorm.php';

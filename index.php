@@ -314,7 +314,7 @@ class ApiController extends AbstractApi {
 
 		// Shaarli API Nodes list
 		$nodes = array(
-			'http://nexen.mkdir.fr/shaarli-api/feeds',
+			'https://nexen.mkdir.fr/shaarli-api/feeds',
 		);
 
 		foreach( $nodes as $node ) {
@@ -324,72 +324,83 @@ class ApiController extends AbstractApi {
 
 			if( !empty($rows) ) {
 
+				$urls = array();
+
 				foreach( $rows as $row ) {
 
 					if( isset($row->url) && !empty($row->url) ) {
 
-						$feed = Feed::create();
-						$feed->url = $row->url;
-
-						try {	
-
-							$feed->save();
-
-						} catch (Exception $e) {
-							
-							// feed already exist
-						}
+						$urls[] = $row->url;
 					}
+				}
+
+				if( !empty($urls) ) {
+
+					$this->addFeeds( $urls );
 				}
 			}
 		}
 
-		$this->syncWithOrosOpml();
+		$this->syncWithOpmlFiles();
 
 		return array('success' => 1);
 	}
 
 	/**
-	 * Sync with Oros OPML file (thanks bro)
+	 * Sync with OPML files
 	 */
-	private function syncWithOrosOpml() {
+	public function syncWithOpmlFiles() {
 
-		// récupération de la liste des shaarlis
-		function get_shaarlis_list() {
+		$files = array(
+			'https://ecirtam.net/shaarlirss/custom/people.opml', // thanks to Oros
+			'https://shaarli.fr/opml.php?mod=opml', // thanks to shaarli.fr
+		);
 
-		    $shaarli_list = array();
+		foreach( $files as $file ) {
 
-		    // Code from Oros, another thanks!
-		    $body = file_get_contents("https://ecirtam.net/shaarlirss/custom/people.opml");
+		    $body = file_get_contents($file);	
 
-		    if(!empty($body)) {
+		    if( !empty($body) ) {
 
+		    	$urls = array();
+
+		    	// Code from Oros, thanks!
 			    $xml = @simplexml_load_string($body);
 
 			    foreach ($xml->body->outline as $value) {
 
 			        $attributes = $value->attributes();
-			        $shaarli_list[] = $attributes->xmlUrl;
+
+			        $urls[] = $attributes->xmlUrl;
 			    }
-		    }
 
-		    return $shaarli_list;       
-		}
+		    	if( !empty($urls) ) {
 
-		$urls = get_shaarlis_list();
+					$this->addFeeds( $urls );
+				}
+		    }	
+		}		
+	}
 
-		foreach( $urls as $url ) {
+	/**
+	 * Push feed url list in database
+	 * @param array urls
+	 */
+	private function addFeeds( $urls ) {
 
-			$feed = Feed::create();
-			$feed->url = $url;
+		if( !empty($urls) ) {
 
-			try {	
+			$urls = array_unique($urls);
 
-				$feed->save();
+			foreach( $urls as $url ) {
 
-			} catch (Exception $e) {
-				
-				// feed already exist
+				$feed = Feed::create();
+				$feed->url = $url;
+
+				if( !$feed->exists() ) {
+
+					$feed->save();
+				}
 			}
 		}
 	}

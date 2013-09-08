@@ -221,12 +221,27 @@ class ApiController extends AbstractApi {
 
 			$term = '%' . $arguments['q'] . '%';
 
-			$entries = Entry::factory()
-					->select_expr('id, date, permalink, title, content, categories')
+			$entries = Feed::factory()
+					->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
+					->select_expr('entries.id, date, permalink, entries.title, content, categories')
+					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
 					// ->where_like('title', $term)
-					->where_raw('(`title` LIKE ? OR `content` LIKE ?)', array($term, $term)) // security: possible injection?
+					->where_raw('(entries.title LIKE ? OR entries.content LIKE ?)', array($term, $term)) // security: possible injection?
 					->order_by_desc('date')
 					->findArray();
+
+			if( $entries != null ) {
+
+				foreach( $entries as &$entry ) {
+
+					$entry['feed']['id'] = $entry['feed_id'];
+					$entry['feed']['url'] = $entry['feed_url'];
+					$entry['feed']['link'] = $entry['feed_link'];
+					$entry['feed']['title'] = $entry['feed_title'];
+
+					unset($entry['feed_id'], $entry['feed_url'], $entry['feed_link'], $entry['feed_title']);
+				}
+			}
 
 			return $entries;
 		}

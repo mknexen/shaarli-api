@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `entries` (
   `permalink` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `content` text COLLATE utf8_unicode_ci,
+  `categories` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `hash` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `feed_id` int(10) unsigned NOT NULL,
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `entries` (
 CREATE TABLE IF NOT EXISTS `feeds` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `link` varchar(255) COLLATE utf8_unicode_ci NULL DEFAULT NULL,  
   `title` varchar(255) COLLATE utf8_unicode_ci NULL DEFAULT NULL,  
   `fetched_at` timestamp NULL DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',

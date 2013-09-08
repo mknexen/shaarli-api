@@ -39,7 +39,7 @@ class CronController {
 
 		// Parsing feed
 		$simplepie = new SimplePie();
-		$simplepie->set_cache_location( __DIR__ . '/cache/simplepie/' );
+		// $simplepie->set_cache_location( __DIR__ . '/cache/simplepie/' );
 
 		$simplepie->set_raw_data( $xml );
 
@@ -47,6 +47,7 @@ class CronController {
 		// $feed->handle_content_type();
 
 		$feed->title = $simplepie->get_title();
+		$feed->link = $simplepie->get_link();
 
 		foreach($simplepie->get_items() as $item) {
 
@@ -61,6 +62,24 @@ class CronController {
 				$entry->permalink = $item->get_permalink();
 				$entry->content = $item->get_content();
 				$entry->date = $item->get_date('Y-m-d H:i:s');
+
+				$categories = $item->get_categories();
+
+				if( !empty($categories) ) {
+
+					$entry_categories = array();
+
+					foreach ($categories as $category) {
+
+						$entry_categories[] = $category->get_label();
+					}
+
+					if( !empty($categories) ) {
+						$entry->categories = implode(',', $entry_categories);
+					}
+				}
+
+				unset($categories, $entry_categories);
 
 				$entry->save();
 			}

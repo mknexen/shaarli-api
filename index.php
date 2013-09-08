@@ -48,6 +48,8 @@ class ApiController extends AbstractApi {
 		// Les formats disponibles
 		$formats = array(
 			'json',
+			'rss',
+			'opml',
 		);
 
 		// Default format: json
@@ -75,6 +77,21 @@ class ApiController extends AbstractApi {
 				echo json_encode($results);				
 			}
 		}
+		elseif( $format == 'rss' ) {
+
+			// TODO RSS format
+			
+			$this->error('Unimplemented');
+		}
+		elseif( $format == 'ompl' ) {
+
+			if( $action == 'feeds' ) {
+
+				// TODO OPML format
+
+				$this->error('Unimplemented');
+			}
+		}
 
 		exit();
 	}
@@ -98,7 +115,7 @@ class ApiController extends AbstractApi {
 	 */
 	protected function feeds( $arguments ) {
 
-		$feeds = Feed::factory()->select_expr('id, url, title');
+		$feeds = Feed::factory()->select_expr('id, url, link, title');
 
 		// Full list
 		if( isset($arguments['full']) && $arguments['full'] == 1 ) {
@@ -122,7 +139,7 @@ class ApiController extends AbstractApi {
 	protected function latest() {
 
 		$entries = Feed::factory()
-					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.title AS feed_title, entries.id, date, permalink, entries.title, content')
+					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.title AS feed_title, entries.id, date, permalink, entries.title, content, categories')
 					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
 					->order_by_desc('date')
 					->limit(50)
@@ -205,7 +222,7 @@ class ApiController extends AbstractApi {
 			$term = '%' . $arguments['q'] . '%';
 
 			$entries = Entry::factory()
-					->select_expr('id, date, permalink, title, content')
+					->select_expr('id, date, permalink, title, content, categories')
 					// ->where_like('title', $term)
 					->where_raw('(`title` LIKE ? OR `content` LIKE ?)', array($term, $term)) // security: possible injection?
 					->order_by_desc('date')

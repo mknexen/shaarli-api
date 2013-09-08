@@ -96,14 +96,23 @@ class ApiController extends AbstractApi {
 	 * Feeds list
 	 * @route /feeds
 	 */
-	protected function feeds() {
+	protected function feeds( $arguments ) {
 
-		$feeds = Feed::factory()
-					->select_expr('id, url, title')
-					->where('enabled', 1)
-					->findArray();
+		$feeds = Feed::factory()->select_expr('id, url, title');
 
-		return $feeds;
+		// Full list
+		if( isset($arguments['full']) && $arguments['full'] == 1 ) {
+
+			$feeds->select_expr('fetched_at, enabled');
+		}
+		else { // Active feeds
+
+			$feeds->where_not_null('title');
+			$feeds->where_raw('title != \'\'');
+			$feeds->where('enabled', 1);
+		}
+
+		return $feeds->findArray();
 	}
 
 	/**
@@ -223,16 +232,16 @@ class ApiController extends AbstractApi {
 		foreach( $nodes as $node ) {
 
 			$content = file_get_contents($node);
-			$feeds = json_decode($content);
+			$rows = json_decode($content);
 
-			if( !empty($feeds) ) {
+			if( !empty($rows) ) {
 
-				foreach( $feeds as $feed ) {
+				foreach( $rows as $row ) {
 
-					if( isset($feed->url) ) {
+					if( isset($row->url) && !empty($row->url) ) {
 
 						$feed = Feed::create();
-						$feed->url = $feed->url;
+						$feed->url = $row->url;
 
 						try {	
 
@@ -260,7 +269,7 @@ class ApiController extends AbstractApi {
 		// récupération de la liste des shaarlis
 		function get_shaarlis_list() {
 
-		    $shaarli_list=array();
+		    $shaarli_list = array();
 
 		    // Code from Oros, another thanks!
 		    $body = file_get_contents("https://ecirtam.net/shaarlirss/custom/people.opml");

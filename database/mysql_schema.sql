@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `entries` (
 CREATE TABLE IF NOT EXISTS `feeds` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,  
+  `title` varchar(255) COLLATE utf8_unicode_ci NULL DEFAULT NULL,  
   `fetched_at` timestamp NULL DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),

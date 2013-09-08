@@ -35,6 +35,7 @@ class ApiController extends AbstractApi {
 			'latest',
 			'top',
 			'search',
+			'discussion',
 			'syncfeeds',
 		);
 
@@ -81,7 +82,7 @@ class ApiController extends AbstractApi {
 
 			// TODO RSS format
 			
-			$this->error('Unimplemented');
+			$this->error('Unimplemented, Contribute: https://github.com/mknexen/shaarli-api');
 		}
 		elseif( $format == 'ompl' ) {
 
@@ -89,7 +90,7 @@ class ApiController extends AbstractApi {
 
 				// TODO OPML format
 
-				$this->error('Unimplemented');
+				$this->error('Unimplemented, Contribute: https://github.com/mknexen/shaarli-api');
 			}
 		}
 
@@ -139,7 +140,8 @@ class ApiController extends AbstractApi {
 	protected function latest() {
 
 		$entries = Feed::factory()
-					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.title AS feed_title, entries.id, date, permalink, entries.title, content, categories')
+					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
+					 ->select_expr('entries.id, date, permalink, entries.title, content, categories')
 					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
 					->order_by_desc('date')
 					->limit(50)
@@ -150,10 +152,11 @@ class ApiController extends AbstractApi {
 			foreach( $entries as &$entry ) {
 
 				$entry['feed']['id'] = $entry['feed_id'];
-				$entry['feed']['url'] = $entry['feed_url'];
+				$entry['feed']['url'] = $entry['feed_url'];				
+				$entry['feed']['link'] = $entry['feed_link'];
 				$entry['feed']['title'] = $entry['feed_title'];
 
-				unset($entry['feed_id'], $entry['feed_url'], $entry['feed_title']);
+				unset($entry['feed_id'], $entry['feed_url'], $entry['feed_link'], $entry['feed_title']);
 			}
 		}
 
@@ -248,6 +251,59 @@ class ApiController extends AbstractApi {
 		else {
 
 			$this->error('Need search term (?q=searchterm)');
+		}
+	}
+
+	/**
+	 * Search linked entries
+	 * @route /discussion
+	 * @args url={url}
+	 */
+	protected function discussion( $arguments ) {
+
+		if( isset($arguments['url']) && !empty($arguments['url']) ) {
+
+			$search_method = 'strict';
+
+			$url = trim($arguments['url']);
+
+			$entries = Feed::factory()
+					->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
+					->select_expr('entries.id, date, permalink, entries.title, content, categories')
+					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
+					->order_by_desc('date');
+
+			if( $search_method == 'strict' ) {
+
+				$entries->where('entries.permalink', $url);
+			}
+			else if( $search_method == 'large' ) {
+
+				// TODO: à réfléchir...
+				$url = trim($url, '/') . '%';
+				$entries->where_like('entries.permalink', $url);
+			}
+
+			$entries = $entries->findArray();
+
+			if( $entries != null ) {
+
+				foreach( $entries as &$entry ) {
+
+					$entry['feed']['id'] = $entry['feed_id'];
+					$entry['feed']['url'] = $entry['feed_url'];
+					$entry['feed']['link'] = $entry['feed_link'];
+					$entry['feed']['title'] = $entry['feed_title'];
+
+					unset($entry['feed_id'], $entry['feed_url'], $entry['feed_link'], $entry['feed_title']);
+				}
+			}
+
+			return $entries;
+		}
+		else {
+
+			$this->error('Need url (?url=url)');
 		}
 	}
 

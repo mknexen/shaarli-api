@@ -190,7 +190,7 @@ class CronController {
 				CURLOPT_SSL_VERIFYPEER => false,
 				CURLOPT_ENCODING => 'gzip',
 				CURLOPT_HTTPHEADER => array(
-					'User-Agent: Shaarli-aAPI (Mozilla Firefox)',
+					'User-Agent: Shaarli-API (Mozilla Firefox)',
 					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 					'Accept-Language: en-US,en;q=0.5',
 					'Accept-Encoding: gzip, deflate',

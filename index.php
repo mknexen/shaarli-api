@@ -84,7 +84,7 @@ class ApiController extends AbstractApi {
 			
 			$this->error('Unimplemented, Contribute: https://github.com/mknexen/shaarli-api');
 		}
-		elseif( $format == 'ompl' ) {
+		elseif( $format == 'opml' ) {
 
 			if( $action == 'feeds' ) {
 

@@ -97,6 +97,7 @@ class CronController {
 				$entry->permalink = $item->get_permalink();
 				$entry->content = $item->get_content();
 				$entry->date = $item->get_date('Y-m-d H:i:s');
+				if( $entry->date == null ) $entry->date = date('Y-m-d H:i:s');
 
 				$categories = $item->get_categories();
 

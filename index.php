@@ -78,19 +78,42 @@ class ApiController extends AbstractApi {
 				echo json_encode($results);				
 			}
 		}
+		// RSS
 		elseif( $format == 'rss' ) {
 
-			// TODO RSS format
-			
-			$this->error('Unimplemented, Contribute: https://github.com/mknexen/shaarli-api');
+			if( $action == 'latest' ) {
+
+				$config = array(
+					'title' => 'Shaarli API - Latest entries',
+				);
+			}
+			elseif( $action == 'search' ) {
+
+				$config = array(
+					'title' => 'Shaarli API - Search feed',
+				);				
+			}
+			else {
+				$this->error('Bad request (RSS format unavailable for this action)');
+				exit();
+			}
+
+			header('Content-type: application/rss+xml; charset=UTF-8');
+			$this->outputRSS( $results, $config );
+			exit();
 		}
+		// OPML
 		elseif( $format == 'opml' ) {
 
 			if( $action == 'feeds' ) {
 
-				// TODO OPML format
-
-				$this->error('Unimplemented, Contribute: https://github.com/mknexen/shaarli-api');
+				header('Content-type: application/x-xml; charset=UTF-8');
+				header('Content-Disposition: attachment; filename="subscriptions.opml"');
+				$this->outputOPML( $results );
+				exit();
+			}
+			else {
+				$this->error('Bad request (OPML format unavailable for this action)');
 			}
 		}
 
@@ -108,6 +131,111 @@ class ApiController extends AbstractApi {
 
 		echo json_encode(array('error' => $message));
 		exit();
+	}
+
+	/**
+	 * Create OPML formated file
+	 */
+	protected function outputOPML( $feeds ) {
+
+		// Code from: https://github.com/pfeff/opml.php
+		$xml = new XMLWriter();
+		$xml->openURI('php://output');
+
+		$xml->startDocument('1.0', 'UTF-8');
+		$xml->startElement('opml');
+		$xml->writeAttribute('version', '2.0');
+
+		// Header
+		$xml->startElement('head');
+		$xml->writeElement('title', 'Shaarli API OPML');
+		$xml->writeElement('dateModified', date("D, d M Y H:i:s T"));
+		$xml->endElement();
+
+		// Body
+		$xml->startElement('body');
+
+			foreach ($feeds as $feed) {
+
+			    $xml->startElement('outline');
+			    $xml->writeAttribute('text', $feed['title']);
+			    $xml->writeAttribute('htmlUrl', $feed['link']);
+			    $xml->writeAttribute('xmlUrl', $feed['url']);
+			    $xml->endElement();
+			}
+
+		$xml->endElement();
+
+		$xml->endElement();
+		$xml->endDocument();
+
+		$xml->flush();
+	}
+
+	/**
+	 * Output as RSS
+	 * @param entries
+	 * @param config
+	 */
+	protected function outputRSS( $entries, $config ) {
+
+		// Inspired from http://www.phpntips.com/xmlwriter-2009-06/
+		@date_default_timezone_set('GMT');
+		$xml = new XMLWriter();
+
+		// Output directly to the user
+		$xml->openURI('php://output');
+		$xml->startDocument('1.0');
+		$xml->setIndent(2);
+		//rss
+		$xml->startElement('rss');
+		$xml->writeAttribute('version', '2.0');
+		$xml->writeAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+
+		//channel
+		$xml->startElement('channel');
+
+		// title, desc, link, date
+		$xml->writeElement('title', $config['title']);
+		// $xml->writeElement('description', $config['description']);
+		// $xml->writeElement('link', 'http://www.example.com/rss.hml');
+		$xml->writeElement('pubDate', date('D, d M Y H:i:s e'));
+
+		if( !empty($entries) ) {
+
+			foreach( $entries as $entry ) {
+
+				// item
+				$xml->startElement('item');
+				$xml->writeElement('title', $entry['title']);
+				$xml->writeElement('link', $entry['permalink']);
+				$xml->startElement('description');
+				$xml->writeCData($entry['content']);
+				$xml->endElement();
+				$xml->writeElement('pubDate', date('D, d M Y H:i:s e', strtotime($entry['date'])));
+
+				// category
+				// $xml->startElement('category');
+				// $xml->writeAttribute('domain', 'http://www.example.com/cat1.htm');
+				// $xml->text('News');
+				// $xml->endElement();
+
+				// end item
+				$xml->endElement();
+			}	
+		}
+
+		// end channel
+		$xml->endElement();
+
+		// end rss
+		$xml->endElement();
+
+		// end doc
+		$xml->endDocument();
+
+		// flush
+		$xml->flush();
 	}
 
 	/**

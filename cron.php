@@ -2,6 +2,8 @@
 
 class CronController {
 
+	public $verbose = true;
+
 	/**
 	 * Fetch all feeds
 	 */
@@ -220,11 +222,12 @@ class CronController {
 	 */
 	protected function verbose( $str ) {
 
-		echo implode("\t", array(
-			date('d/m/Y H:i:s'),
-			$str,
-			"\n"
-		));
+		if( $this->verbose === true )
+			echo implode("\t", array(
+				date('d/m/Y H:i:s'),
+				$str,
+				"\n"
+			));
 	}
 }
 
@@ -235,5 +238,23 @@ if( !is_php_cli() ) die();
 
 require_once __DIR__ . '/bootstrap.php';
 
-$controller = new CronController();
-$controller->fetchAll();
+if( isset($argv[1]) ) {
+
+	if( $argv[1] == '--daemon'  ) { // daemon mode
+
+		while(true) {
+
+			$controller = new CronController();
+			$controller->verbose = false;
+			$controller->fetchAll();
+			unset($controller);
+
+			sleep(60 * 15); // 15 minutes
+		}
+	}
+}
+else { // standard mode
+
+	$controller = new CronController();
+	$controller->fetchAll();
+}

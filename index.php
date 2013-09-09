@@ -332,7 +332,7 @@ class ApiController extends AbstractApi {
 					break;
 			}
 
-			return $entries->findArray();		
+			return $entries->findArray();
 		}
 		else {
 

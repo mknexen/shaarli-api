@@ -349,16 +349,35 @@ class ApiController extends AbstractApi {
 
 		if( isset($arguments['q']) && !empty($arguments['q']) ) {
 
-			$term = '%' . $arguments['q'] . '%';
+			$term = $arguments['q'];
+
+			// Advanced Search
+			$adv_search = null;
+
+			if( preg_match('/^title\:/i', $term) ) {
+
+				$term = preg_replace('/^title\:/', '', $term);
+				$adv_search = 'title';
+			}
+
+			$term = '%' . $term . '%';
 
 			$entries = Feed::factory()
 					->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
 					->select_expr('entries.id, date, permalink, entries.title, content, categories')
 					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
-					// ->where_like('title', $term)
-					->where_raw('(entries.title LIKE ? OR entries.content LIKE ?)', array($term, $term)) // security: possible injection?
-					->order_by_desc('date')
-					->findArray();
+					->order_by_desc('date');
+
+			if( $adv_search == 'title' ) { // Search in title only
+
+				$entries->where_like('entries.title', $term);
+			}
+			else {
+
+				$entries->where_raw('(entries.title LIKE ? OR entries.content LIKE ?)', array($term, $term)); // security: possible injection?
+			}
+
+			$entries = $entries->findArray();
 
 			if( $entries != null ) {
 

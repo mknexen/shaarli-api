@@ -264,15 +264,29 @@ class ApiController extends AbstractApi {
 	 * Latest entries
 	 * @route /latest
 	 */
-	protected function latest() {
+	protected function latest( $arguments ) {
 
 		$entries = Feed::factory()
 					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
 					 ->select_expr('entries.id, date, permalink, entries.title, content, categories')
 					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
-					->order_by_desc('date')
-					->limit(50)
-					->findArray();
+					->order_by_desc('date');
+
+		// Count reshare links
+		if( isset($arguments['reshare']) && $arguments['reshare'] == 1 ) {
+
+			$entries->select_expr('(SELECT COUNT(1) FROM entries AS e2 WHERE entries.permalink=e2.permalink) AS shares');
+		}
+
+		// Limit
+		if( isset($arguments['limit']) && $arguments['limit'] >= 5 && $arguments['limit'] <= 50 ) {
+			$entries->limit( (int) $arguments['limit'] );
+		}
+		else {
+			$entries->limit(50);
+		}
+
+		$entries = $entries->findArray();
 
 		if( $entries != null ) {
 

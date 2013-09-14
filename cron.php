@@ -10,6 +10,7 @@ class CronController {
 	public function fetchAll() {
 
 		$feeds = Feed::factory()
+					->where_raw('(fetched_at IS NULL OR fetched_at < ADDDATE(NOW(), INTERVAL (fetch_interval * -1) MINUTE))')
 					->where('enabled', 1)
 					->findMany();
 
@@ -17,11 +18,15 @@ class CronController {
 
 			require_once __DIR__ . '/vendor/simplepie-simplepie-e9472a1/autoloader.php';
 			
-			foreach( $feeds as $feed ) {
+			foreach( $feeds as &$feed ) {
 
 				$this->fetch( $feed );
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
@@ -45,6 +50,8 @@ class CronController {
 
 			$feed->title = '[ERROR HTTP CODE ' . $request['info']['http_code'] . ']';
 			$feed->link = null;
+			$feed->fetch_interval = 60;
+			$feed->fetched();
 			$feed->save();
 
 			$this->verbose( 'Error Fetching: ' . $feed->url );
@@ -55,6 +62,8 @@ class CronController {
 
 			$feed->title = '[ERROR SERVER RETURN EMPTY CONTENT]';
 			$feed->link = null;
+			$feed->fetch_interval = 60;
+			$feed->fetched();
 			$feed->save();
 
 			$this->verbose( 'Error Fetching: ' . $feed->url );
@@ -74,6 +83,8 @@ class CronController {
 
 			$feed->title = '[ERROR PARSING FEED]';
 			$feed->link = null;
+			$feed->fetch_interval = 60;
+			$feed->fetched();
 			$feed->save();
 
 			$this->verbose( 'Error parsing: ' . $feed->url );
@@ -86,6 +97,8 @@ class CronController {
 
 		$items = $simplepie->get_items();
 
+		$new_entries_counter = 0;
+
 		foreach($items as $item) {
 
 			$entry = Entry::create();
@@ -96,7 +109,7 @@ class CronController {
 			if( !$entry->exists() ) {
 
 				$entry->title = $item->get_title();
-				$entry->permalink = $item->get_permalink();
+				$entry->permalink = htmlspecialchars_decode($item->get_permalink());
 				$entry->content = $item->get_content();
 				$entry->date = $item->get_date('Y-m-d H:i:s');
 				if( $entry->date == null ) $entry->date = date('Y-m-d H:i:s');
@@ -120,6 +133,18 @@ class CronController {
 				unset($categories, $entry_categories);
 
 				$entry->save();
+
+				$new_entries_counter++;
+			}
+		}
+
+		// Activity detection
+		if( $new_entries_counter > 0 ) {
+			$feed->fetch_interval = 3;
+		}
+		else {
+			if( ($feed->fetch_interval * 1.5 ) <= 20 ) {
+				$feed->fetch_interval = round( $feed->fetch_interval * 1.5 );
 			}
 		}
 
@@ -246,10 +271,10 @@ if( isset($argv[1]) ) {
 
 			$controller = new CronController();
 			$controller->verbose = false;
-			$controller->fetchAll();
+			$success = $controller->fetchAll();
 			unset($controller);
 
-			sleep(60 * 15); // 15 minutes
+			if( !$success ) sleep(30);
 		}
 	}
 }

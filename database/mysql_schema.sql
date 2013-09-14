@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `entries` (
   `feed_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `feed_id` (`feed_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `feeds` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `feeds` (
   `link` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `fetch_interval` int(2) NOT NULL DEFAULT '15',
   `fetched_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

@@ -326,37 +326,61 @@ class ApiController extends AbstractApi {
 			'alltime',
 		);
 
-		if( isset($arguments['interval']) && in_array($arguments['interval'], $intervals)) {
+		if( isset($arguments['interval']) ) {
+
+			if( in_array($arguments['interval'], $intervals) ) {
+
+				$entries = Entry::factory()
+						->select_expr('permalink, entries.title, COUNT(1) AS count')
+						->order_by_desc('count')
+						->group_by('permalink')
+						->having_gt('count', 1);
+
+				switch ($arguments['interval']) {
+					case '12h':					
+						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -12 HOUR)');
+						break;
+					case '24h':					
+						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -24 HOUR)');
+						break;
+					case '48h':
+						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -48 HOUR)');
+						break;
+					case '1month':					
+						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
+						break;
+					case '3month':					
+						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
+						break;
+				}
+
+				return $entries->findArray();				
+			}
+			else {
+
+				$this->error('Invalid interval (?interval={' . implode('|', $intervals) . '})');
+			}
+		}
+		elseif( isset($arguments['date']) && !empty($arguments['date'])) {
+
+			// TODO parse date
+			$date = date('Y-m-d', strtotime('-1 days'));
+
+			$results = array();
 
 			$entries = Entry::factory()
-					->select_expr('permalink, entries.title, COUNT(1) AS count')
-					->order_by_desc('count')
-					->group_by('permalink')
-					->having_gt('count', 1);
+				->select_expr('permalink, entries.title, COUNT(1) AS count')
+				->where_raw('DATE(entries.date)=?', array($date))
+				->order_by_desc('count')
+				->group_by('permalink')
+				->having_gt('count', 1);
 
-			switch ($arguments['interval']) {
-				case '12h':					
-					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -12 HOUR)');
-					break;
-				case '24h':					
-					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -24 HOUR)');
-					break;
-				case '48h':
-					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -48 HOUR)');
-					break;
-				case '1month':					
-					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
-					break;
-				case '3month':					
-					$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
-					break;
-			}
+			$entries = $entries->findArray();
 
-			return $entries->findArray();
-		}
-		else {
+			$results['date'] = $date;
+			$results['entries'] = $entries;
 
-			$this->error('Invalid interval (?interval={' . implode('|', $intervals) . '})');
+			return $results;
 		}
 	}
 

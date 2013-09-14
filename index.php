@@ -36,6 +36,7 @@ class ApiController extends AbstractApi {
 			'top',
 			'search',
 			'discussion',
+			'bestlinks',
 			'syncfeeds',
 		);
 
@@ -92,6 +93,12 @@ class ApiController extends AbstractApi {
 				$config = array(
 					'title' => 'Shaarli API - Search feed',
 				);				
+			}
+			elseif( $action == 'bestlinks' ) {
+
+				$config = array(
+					'title' => 'Shaarli API - Best links',
+				);
 			}
 			else {
 				$this->error('Bad request (RSS format unavailable for this action)');
@@ -180,7 +187,6 @@ class ApiController extends AbstractApi {
 	protected function outputRSS( $entries, $config ) {
 
 		// Inspired from http://www.phpntips.com/xmlwriter-2009-06/
-		@date_default_timezone_set('GMT');
 		$xml = new XMLWriter();
 
 		// Output directly to the user
@@ -199,7 +205,7 @@ class ApiController extends AbstractApi {
 		$xml->writeElement('title', $config['title']);
 		// $xml->writeElement('description', $config['description']);
 		// $xml->writeElement('link', 'http://www.example.com/rss.hml');
-		$xml->writeElement('pubDate', date('D, d M Y H:i:s e'));
+		$xml->writeElement('pubDate', date('r'));
 
 		if( !empty($entries) ) {
 
@@ -212,7 +218,7 @@ class ApiController extends AbstractApi {
 				$xml->startElement('description');
 				$xml->writeCData($entry['content']);
 				$xml->endElement();
-				$xml->writeElement('pubDate', date('D, d M Y H:i:s e', strtotime($entry['date'])));
+				$xml->writeElement('pubDate', date('r', strtotime($entry['date'])));
 
 				// category
 				// $xml->startElement('category');
@@ -352,6 +358,37 @@ class ApiController extends AbstractApi {
 
 			$this->error('Invalid interval (?interval={' . implode('|', $intervals) . '})');
 		}
+	}
+
+	/**
+	 * Best reshared links
+	 */
+	protected function bestlinks( $arguments ) {
+
+		$entries = Feed::factory()
+				->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
+				->select_expr('MIN(entries.date) AS date, permalink, entries.title, content, COUNT(1) AS count')
+				->join('entries', array('entries.feed_id', '=', 'feeds.id'))
+				->order_by_expr('MIN(entries.date) DESC')
+				->group_by('permalink')
+				->having_raw('count > 1'); // TODO group order wtf
+
+		$entries = $entries->findArray();
+
+		if( $entries != null ) {
+
+			foreach( $entries as &$entry ) {
+
+				$entry['feed']['id'] = $entry['feed_id'];
+				$entry['feed']['url'] = $entry['feed_url'];
+				$entry['feed']['link'] = $entry['feed_link'];
+				$entry['feed']['title'] = $entry['feed_title'];
+
+				unset($entry['feed_id'], $entry['feed_url'], $entry['feed_link'], $entry['feed_title']);
+			}
+		}
+
+		return $entries;
 	}
 
 	/**

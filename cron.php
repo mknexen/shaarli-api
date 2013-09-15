@@ -150,6 +150,8 @@ class CronController {
 
 		$feed->fetched();
 		$feed->save();
+
+		$this->getFavicon( $feed );
 	}
 
 	/**
@@ -195,6 +197,32 @@ class CronController {
 		$feed->save();
 
 		unset($request);
+	}
+
+	/**
+	 * Get feed favicon
+	 */
+	protected function getFavicon( &$feed ) {
+
+		$dir = __DIR__ . '/favicon/';
+		$favicon = $dir . $feed->id . '.ico';
+
+		if( !file_exists($favicon) ) {
+
+			if( $feed->link != null ) {
+
+				$service = 'http://g.etfv.co/' . urlencode($feed->link);
+
+				$this->verbose('Downloading favicon: ' . $feed->link);
+
+				$content = file_get_contents($service);
+
+				if( !empty($content) ) {
+
+					file_put_contents($favicon, $content);
+				}
+			}
+		}
 	}
 
 	/**

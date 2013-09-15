@@ -214,11 +214,11 @@ class CronController {
 
 				$this->verbose('Downloading favicon: ' . $feed->link);
 
-				$content = file_get_contents($service);
+				$request = $this->makeRequest($service);
 
-				if( !empty($content) ) {
+				if( !empty($request['html']) ) {
 
-					file_put_contents($favicon, $content);
+					file_put_contents($favicon, $request['html']);
 				}
 			}
 		}
@@ -245,7 +245,7 @@ class CronController {
 				CURLOPT_SSL_VERIFYPEER => false,
 				CURLOPT_ENCODING => 'gzip',
 				CURLOPT_HTTPHEADER => array(
-					'User-Agent: Shaarli-API (Mozilla Firefox)',
+					'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0',
 					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 					'Accept-Language: en-US,en;q=0.5',
 					'Accept-Encoding: gzip, deflate',

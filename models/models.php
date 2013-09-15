@@ -83,12 +83,24 @@ class Feed extends ModelBase {
 	}
 
 	/**
-	 * Find one feed by this id
+	 * Find single feed by this id
 	 * @param int id
 	 */
 	public static function findById( $id ) {
 
 		return self::factory()->find_one($id);
+	}
+
+	/**
+	 * Find single feed by this url
+	 * @param string url
+	 */
+	public static function findByUrl( $url ) {
+
+		return self::factory()
+			->where_raw('link = ? OR url = ?', array($url, $url))
+			->limit(1)
+			->find_one();
 	}
 }
 

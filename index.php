@@ -38,6 +38,7 @@ class ApiController extends AbstractApi {
 			'discussion',
 			'bestlinks',
 			'syncfeeds',
+			'ping',
 		);
 
 		$action = $this->getRequestAction();
@@ -624,6 +625,35 @@ class ApiController extends AbstractApi {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Ping service
+	 * @route /ping
+	 * @args url={url}
+	 */
+	public function ping( $arguments ) {
+
+		if( isset($arguments['url']) && !empty($arguments['url']) ) {
+
+			$json = array( 'success' => 0 );
+
+			$feed = Feed::findByUrl( $arguments['url'] );
+
+			if( $feed != null ) {
+
+				$feed->fetched_at = null;
+				$feed->save();
+
+				$json['success'] = 1;	
+			}
+
+			return $json;
+		}
+		else {
+
+			$this->error('Need url (?url=url)');
+		}		
 	}
 }
 

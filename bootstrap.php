@@ -23,3 +23,5 @@ require_once __DIR__ . '/models/models.php';
 ORM::configure('mysql:host=localhost;dbname=shaarli-api');
 ORM::configure('username', 'shaarli-api');
 ORM::configure('password', 'shaarli-api');
+
+define('FAVICON_DIRECTORY', __DIR__ . '/favicon/');

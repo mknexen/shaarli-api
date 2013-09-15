@@ -204,8 +204,7 @@ class CronController {
 	 */
 	protected function getFavicon( &$feed ) {
 
-		$dir = __DIR__ . '/favicon/';
-		$favicon = $dir . $feed->id . '.ico';
+		$favicon = FAVICON_DIRECTORY . $feed->id . '.ico';
 
 		if( !file_exists($favicon) ) {
 

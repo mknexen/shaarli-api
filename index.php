@@ -38,6 +38,7 @@ class ApiController extends AbstractApi {
 			'discussion',
 			'bestlinks',
 			'syncfeeds',
+			'getfavicon',
 			'ping',
 		);
 
@@ -625,6 +626,32 @@ class ApiController extends AbstractApi {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Favicon service
+	 * @route /getfavicon
+	 * @args id={feed_id}
+	 */
+	public function getfavicon( $arguments ) {
+
+		if( isset($arguments['id']) && !empty($arguments['id']) ) {
+
+			if( is_numeric($arguments['id']) && $arguments['id'] > 0 ) {
+
+				$favicon = FAVICON_DIRECTORY . $arguments['id'] . '.ico';
+
+				header('Content-Type: image/png');
+
+				if( !file_exists($favicon) ) {
+					$favicon = __DIR__ . '/favicon.ico';
+				}
+
+				readfile( $favicon );
+			}
+		}
+
+		exit();
 	}
 
 	/**

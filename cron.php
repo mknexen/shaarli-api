@@ -210,13 +210,13 @@ class CronController {
 
 			if( $feed->link != null ) {
 
-				$service = 'http://g.etfv.co/' . urlencode($feed->link);
+				$service = 'http://g.etfv.co/' . urlencode($feed->link); // it's google app engine service, fuck!
 
 				$this->verbose('Downloading favicon: ' . $feed->link);
 
 				$request = $this->makeRequest($service);
 
-				if( !empty($request['html']) ) {
+				if( $request['info']['http_code'] == 200 && !empty($request['html']) ) {
 
 					file_put_contents($favicon, $request['html']);
 				}
@@ -243,6 +243,7 @@ class CronController {
 				CURLOPT_CONNECTTIMEOUT => 15,
 				CURLOPT_TIMEOUT => 30,
 				CURLOPT_SSL_VERIFYPEER => false,
+				CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
 				CURLOPT_ENCODING => 'gzip',
 				CURLOPT_HTTPHEADER => array(
 					'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0',

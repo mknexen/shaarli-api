@@ -5,7 +5,6 @@ Shaarli REST API
 * Create mysql database shaarli-api
 * Install database schema /database/mysql_schema.sql
 * Set database connection string in /bootstrap.php
-* Set write permission on cache directory
 * Enable Apache RewriteEngine
 * Initialize feed list with api action /syncfeeds
 * Set cronjob: php cron.php

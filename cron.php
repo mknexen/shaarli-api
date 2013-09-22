@@ -5,6 +5,59 @@ class CronController {
 	public $verbose = true;
 
 	/**
+	 * Check database
+	 */
+	public function check() {
+
+		try {
+			
+			$this->countFeeds();
+
+		} catch (Exception $e) {
+			
+			if( $e->getCode() == '42S02' ) {
+
+				$this->verbose('Empty database! Creating tables...');
+
+				$scheme = __DIR__ . '/database/mysql_schema.sql';
+
+				if( file_exists($scheme) ) {
+
+					$scheme = file_get_contents( $scheme );
+
+					ORM::for_table('')->raw_execute( $scheme );					
+				}
+			};
+		}
+
+		try {
+			
+			$count = $this->countFeeds();
+
+			if( $count == 0 ) {
+
+				$this->syncFeeds();
+			}
+
+		} catch (Exception $e) {
+			
+			$this->verbose('Unable to create tables');
+		}
+	}
+
+	/**
+	 * Run
+	 */
+	public function run() {
+
+		if( $this->countFeeds() == 0 ) { // Initialize feeds list
+			$this->syncFeeds();
+		}
+
+		$this->fetchAll();
+	}
+
+	/**
 	 * Fetch all feeds
 	 */
 	public function fetchAll() {
@@ -225,6 +278,27 @@ class CronController {
 	}
 
 	/**
+	 * Sync feeds lists
+	 */
+	public function syncFeeds() {
+
+		$this->verbose('Syncing feeds list... (got ' . $this->countFeeds() . ' feeds)');
+
+		require_once __DIR__ . '/class/ApiController.php';
+
+		$controller = new ApiController();
+		$controller->syncfeeds();
+
+		unset( $controller );
+
+		$this->verbose('Feeds list synced (got ' . $this->countFeeds() . ' feeds)');
+	}
+
+	protected function countFeeds() {
+		return Feed::factory()->count();
+	}
+
+	/**
 	 * Make http request and return html content
 	 */
 	public function makeRequest( $url ) {
@@ -287,27 +361,35 @@ class CronController {
 function is_php_cli() {
 	return function_exists('php_sapi_name') && php_sapi_name() === 'cli';
 }
-if( !is_php_cli() ) die();
+if( is_php_cli() ) {
 
-require_once __DIR__ . '/bootstrap.php';
+	require_once __DIR__ . '/bootstrap.php';
 
-if( isset($argv[1]) ) {
+	if( isset($argv[1]) ) {
 
-	if( $argv[1] == '--daemon'  ) { // daemon mode
+		if( $argv[1] == '--daemon'  ) { // daemon mode
 
-		while(true) {
+			while(true) {
 
-			$controller = new CronController();
-			$controller->verbose = false;
-			$success = $controller->fetchAll();
-			unset($controller);
+				$controller = new CronController();
+				$controller->verbose = false;
+				$success = $controller->fetchAll();
+				unset($controller);
 
-			if( !$success ) sleep(30);
+				if( !$success ) sleep(30);
+			}
 		}
 	}
-}
-else { // standard mode
+	else { // standard mode
 
-	$controller = new CronController();
-	$controller->fetchAll();
+		$controller = new CronController();
+		$controller->check();
+		$controller->run();
+	}
+}
+else {
+
+	// TODO webcron
+
+	die();
 }

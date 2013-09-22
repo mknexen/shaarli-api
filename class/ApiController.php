@@ -73,6 +73,10 @@ class ApiController extends AbstractApiController {
 			if( isset($results['favicon']) && file_exists($results['favicon']) ) {
 
 				header('Content-Type: image/png');
+				header('Cache-Control: private, max-age=10800, pre-check=10800');
+				header('Pragma: private');
+				header('Expires: ' . date(DATE_RFC822,strtotime('7 day')));
+
 				readfile( $results['favicon'] );	
 			}
 
@@ -135,19 +139,7 @@ class ApiController extends AbstractApiController {
 	public function syncfeeds() {
 
 		$api = new ShaarliApi();
-
-		// Shaarli API Nodes list
-		$nodes = array(
-			'https://nexen.mkdir.fr/shaarli-api/feeds',
-		);
-
-		$api->syncfeeds( $nodes );
-
-		$files = array(
-			'https://ecirtam.net/shaarlirss/custom/people.opml', // thanks to Oros
-			'https://shaarli.fr/opml.php?mod=opml', // thanks to shaarli.fr
-		);
-
-		$api->syncWithOpmlFiles( $files );
+		$api->syncfeeds( shaarli_api_nodes() );
+		$api->syncWithOpmlFiles( shaarli_opml_files() );
 	}
 }

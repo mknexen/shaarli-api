@@ -9,7 +9,7 @@
 
 require_once __DIR__ . '/vendor/idiorm.php';
 require_once __DIR__ . '/vendor/paris.php';
-require_once __DIR__ . '/models/models.php';
+require_once __DIR__ . '/class/models.php';
 
 /**
  * Database configuration

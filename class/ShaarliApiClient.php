@@ -5,14 +5,16 @@
  */
 class ShaarliApiClient {
 
-	public $url = null;
+	public $url = 'https://nexen.mkdir.fr/shaarli-api/';
 
 	/** 
 	 * Constructor
 	 */
-	public function __construct( $url ) {
+	public function __construct( $url = null ) {
 
-		$this->url = $url;
+		if( $url != null ) {
+			$this->url = $url;
+		}		
 	}
 
 	/**

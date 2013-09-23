@@ -10,16 +10,30 @@ class ShaarliApi {
 
 		$feeds = Feed::factory();
 
-		// Full list
+		// Full feed list
 		if( isset($arguments['full']) && $arguments['full'] == 1 ) {
 
 			$feeds->select_expr('feeds.*');
 		}
-		else { // Active feeds
+
+		// Disabled feeds
+		elseif( isset($arguments['disabled']) && $arguments['disabled'] == 1 ) {
+
+			$feeds->where('enabled', 0);
+		}
+
+		// Feeds with error
+		elseif( isset($arguments['error']) && $arguments['error'] == 1 ) {
+
+			$feeds->where_not_null('error');
+		}
+
+		// Active feeds
+		else {
 
 			$feeds->select_expr('id, url, link, title');
 			$feeds->where_null('error');
-			$feeds->where('enabled', 1);
+			$feeds->where('enabled', 1);			
 		}
 
 		return $feeds->findArray();

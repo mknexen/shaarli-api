@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `feeds` (
   `https` tinyint(1) DEFAULT NULL,
   `link` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `error` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
   `fetch_interval` int(2) NOT NULL DEFAULT '15',
   `fetched_at` timestamp NULL DEFAULT NULL,

@@ -101,8 +101,7 @@ class CronController {
 
 		if( $request['info']['http_code'] != 200 ) {
 
-			$feed->title = '[ERROR HTTP CODE ' . $request['info']['http_code'] . ']';
-			$feed->link = null;
+			$feed->error = '[ERROR HTTP CODE ' . $request['info']['http_code'] . ']';
 			$feed->fetch_interval = 60;
 			$feed->fetched();
 			$feed->save();
@@ -113,8 +112,7 @@ class CronController {
 		}
 		if( empty($request['html']) ) {
 
-			$feed->title = '[ERROR SERVER RETURN EMPTY CONTENT]';
-			$feed->link = null;
+			$feed->error = '[ERROR SERVER RETURN EMPTY CONTENT]';
 			$feed->fetch_interval = 60;
 			$feed->fetched();
 			$feed->save();
@@ -134,8 +132,7 @@ class CronController {
 
 		if( $success === false ) {
 
-			$feed->title = '[ERROR PARSING FEED]';
-			$feed->link = null;
+			$feed->error = '[ERROR PARSING FEED]';
 			$feed->fetch_interval = 60;
 			$feed->fetched();
 			$feed->save();
@@ -201,6 +198,7 @@ class CronController {
 			}
 		}
 
+		$feed->error = null;
 		$feed->fetched();
 		$feed->save();
 
@@ -320,9 +318,9 @@ class CronController {
 				CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
 				CURLOPT_ENCODING => 'gzip',
 				CURLOPT_HTTPHEADER => array(
-					'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0',
+					'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0',
 					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-					'Accept-Language: en-US,en;q=0.5',
+					'Accept-Language: fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3',
 					'Accept-Encoding: gzip, deflate',
 					'DNT: 1',
 					'Connection: keep-alive',

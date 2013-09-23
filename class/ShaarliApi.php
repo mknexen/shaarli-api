@@ -8,16 +8,17 @@ class ShaarliApi {
 	 */
 	public function feeds( $arguments ) {
 
-		$feeds = Feed::factory()->select_expr('id, url, link, title');
+		$feeds = Feed::factory();
 
 		// Full list
 		if( isset($arguments['full']) && $arguments['full'] == 1 ) {
 
-			$feeds->select_expr('https, enabled, fetched_at, created_at');
+			$feeds->select_expr('feeds.*');
 		}
 		else { // Active feeds
 
-			$feeds->where_not_null('link');
+			$feeds->select_expr('id, url, link, title');
+			$feeds->where_null('error');
 			$feeds->where('enabled', 1);
 		}
 

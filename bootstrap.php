@@ -35,6 +35,8 @@ function shaarli_api_nodes() {
 	return array(
 		// Nexen
 		'https://nexen.mkdir.fr/shaarli-api/feeds',
+		// Porneia (http://porneia.free.fr/pub/bazaar/shaarli_online.html)
+		// 'https://nexen.mkdir.fr/dropbox/porneia.json',
 	);
 }
 // OPML files

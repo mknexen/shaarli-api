@@ -249,7 +249,7 @@ class ShaarliApi {
 	}
 
 	/**
-	 * Randm entries
+	 * Random entries
 	 * @route /random
 	 */
 	public function random( $arguments ) {
@@ -337,6 +337,51 @@ class ShaarliApi {
 
 			throw new ShaarliApiException('Need url (?url=url)');
 		}
+	}
+
+	/**
+	 * Keywords list
+	 * @route /keywords
+	 */
+	public function keywords() {
+
+		$entries = Entry::factory()
+			->select_expr('categories')
+			->where_raw('categories IS NOT NULL')
+			->findArray();
+
+		$keywords = array();
+
+		if( !empty($entries) ) {
+
+			foreach( $entries as $entry ) {
+
+				$categories = explode(',', $entry['categories']);
+
+				if( !empty($categories) ) {
+
+					foreach( $categories as $categorie ) {
+
+						$categorie = trim($categorie);
+						$categorie = ltrim($categorie, '#');
+
+						if( !empty($categorie) ) {
+
+							if( isset($keywords[$categorie]) ) {
+								$keywords[$categorie]++;
+							}
+							else {
+								$keywords[$categorie] = 1;
+							}							
+						}
+					}
+				}
+			}
+
+			arsort($keywords);
+		}
+
+		return $keywords;
 	}
 
 	/**

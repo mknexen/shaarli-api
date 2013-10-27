@@ -18,6 +18,7 @@ class ApiController extends AbstractApiController {
 			'search',
 			'discussion',
 			'bestlinks',
+			'random',
 			'syncfeeds',
 			'getfavicon',
 			'ping',

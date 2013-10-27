@@ -249,6 +249,50 @@ class ShaarliApi {
 	}
 
 	/**
+	 * Randm entries
+	 * @route /random
+	 */
+	public function random( $arguments ) {
+
+		$entries = Feed::factory()
+					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
+					 ->select_expr('entries.id, date, permalink, entries.title, content, categories')
+					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
+					->order_by_expr('RAND()');
+
+		// Count reshare links
+		if( isset($arguments['reshare']) && $arguments['reshare'] == 1 ) {
+
+			$entries->select_expr('(SELECT COUNT(1) FROM entries AS e2 WHERE entries.permalink=e2.permalink) AS shares');
+		}
+
+		// Limit
+		if( isset($arguments['limit']) && $arguments['limit'] >= 5 && $arguments['limit'] <= 100 ) {
+			$entries->limit( (int) $arguments['limit'] );
+		}
+		else {
+			$entries->limit(50);
+		}
+
+		$entries = $entries->findArray();
+
+		if( $entries != null ) {
+
+			foreach( $entries as &$entry ) {
+
+				$entry['feed']['id'] = $entry['feed_id'];
+				$entry['feed']['url'] = $entry['feed_url'];				
+				$entry['feed']['link'] = $entry['feed_link'];
+				$entry['feed']['title'] = $entry['feed_title'];
+
+				unset($entry['feed_id'], $entry['feed_url'], $entry['feed_link'], $entry['feed_title']);
+			}
+		}
+
+		return $entries;
+	}
+
+	/**
 	 * Search linked entries
 	 * @route /discussion
 	 * @args url={url}

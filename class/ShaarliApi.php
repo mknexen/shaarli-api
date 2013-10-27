@@ -260,12 +260,6 @@ class ShaarliApi {
 					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
 					->order_by_expr('RAND()');
 
-		// Count reshare links
-		if( isset($arguments['reshare']) && $arguments['reshare'] == 1 ) {
-
-			$entries->select_expr('(SELECT COUNT(1) FROM entries AS e2 WHERE entries.permalink=e2.permalink) AS shares');
-		}
-
 		// Limit
 		if( isset($arguments['limit']) && $arguments['limit'] >= 5 && $arguments['limit'] <= 100 ) {
 			$entries->limit( (int) $arguments['limit'] );

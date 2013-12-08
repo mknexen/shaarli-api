@@ -26,7 +26,6 @@ ORM::configure('mysql:host='. DB_HOST .';dbname='. DB_NAME);
 ORM::configure('username', DB_USER);
 ORM::configure('password', DB_PASS);
 
-
 /**
  * Sync configuration
  */

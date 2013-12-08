@@ -45,7 +45,7 @@ abstract class AbstractApiController {
 		header('Content-type: application/json');
 
 		// Petty JSON
-		if( $pretty = false ) {
+		if( $pretty ) {
 
 			echo json_encode($results, JSON_PRETTY_PRINT);
 		}

@@ -1,3 +1,5 @@
 cache/*.*
 favicon/*.ico
 *.log
+.idea/
+config.php

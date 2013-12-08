@@ -1,0 +1,6 @@
+<?php
+
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'shaarli-api');
+define('DB_USER', 'shaarli-api');
+define('DB_PASSWD', 'shaarli-api');

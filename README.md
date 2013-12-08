@@ -14,6 +14,9 @@ Shaarli REST API
 * Apache RewriteEngine
 
 ### Install via SSH exemple (debian)
+
+Copy `config.php.dist` into `config.php` and setup your own settings.
+
 ```
 cd /var/www
 # Clone repo
@@ -21,8 +24,6 @@ git clone https://github.com/mknexen/shaarli-api.git
 # Create mysql database
 mysqladmin create shaarli-api -p
 cd shaarli-api
-# Configure connection string, user and password
-nano bootstrap.php
 # Run cron
 php cron.php
 ```

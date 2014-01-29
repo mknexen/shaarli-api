@@ -21,8 +21,9 @@ git clone https://github.com/mknexen/shaarli-api.git
 # Create mysql database
 mysqladmin create shaarli-api -p
 cd shaarli-api
-# Configure connection string, user and password
-nano bootstrap.php
+# Copy `config.php.dist` into `config.php` and setup your own settings.
+cp config.php.dist config.php
+nano config.php
 # Run cron
 php cron.php
 ```

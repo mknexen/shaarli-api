@@ -8,7 +8,7 @@ class ModelBase extends Model {
 	/**
 	 * Get model factory
 	 */
-	public static function factory() {
+	public static function factory($remove = null, $strict_error = null) {
 		return Model::factory(get_called_class());
 	}
 

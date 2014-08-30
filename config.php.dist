@@ -13,7 +13,43 @@
  *   ArthurHoaro (https://github.com/ArthurHoaro)
  */
 
+/**
+ * Database configuration
+ */
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'shaarli-api');
 define('DB_USER', 'shaarli-api');
 define('DB_PASS', 'shaarli-api');
+
+// Favicon directory
+define('FAVICON_DIRECTORY', __DIR__ . '/favicon/');
+
+
+
+
+// Ne toucher à rien après cette ligne si vous ne savez pas se que vous faite =)
+
+
+/**
+ * Sync configuration
+ */
+
+// Synchronisation de la liste des shaarlis avec d'autre shaarli-api ou export au format JSON
+function shaarli_api_nodes() {
+	return array(
+		// Nexen
+		'https://nexen.mkdir.fr/shaarli-api/feeds',
+		// Porneia (http://porneia.free.fr/pub/bazaar/shaarli_online.html)
+		// 'https://nexen.mkdir.fr/dropbox/porneia.json',
+	);
+}
+
+// Synchronisation de la liste des shaarlis avec des exports OPML
+function shaarli_opml_files() {
+	return array(
+		// Oros OPML
+		'https://ecirtam.net/shaarlirss/custom/people.opml', 
+		// shaarli.fr OPML
+		'https://shaarli.fr/opml.php?mod=opml',
+	);
+}

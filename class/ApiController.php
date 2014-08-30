@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/AbstractApiController.php';
-require_once __DIR__ . '/ShaarliApi.php';
-
 class ApiController extends AbstractApiController {
 
 	/**

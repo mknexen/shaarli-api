@@ -1,0 +1,12 @@
+{
+    "require": {
+        "simplepie/simplepie": "dev-master",
+        "j4mie/paris": "dev-master"
+    },
+    "autoload": {
+        "files": [
+            "class/models.php"
+        ],
+        "classmap": ["class"]
+    }
+}

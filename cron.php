@@ -69,8 +69,6 @@ class CronController {
 
 		if( $feeds != null ) {
 
-			require_once __DIR__ . '/vendor/simplepie-simplepie-e9472a1/autoloader.php';
-			
 			foreach( $feeds as &$feed ) {
 
 				$this->fetch( $feed );
@@ -282,8 +280,6 @@ class CronController {
 
 		$this->verbose('Syncing feeds list... (got ' . $this->countFeeds() . ' feeds)');
 
-		require_once __DIR__ . '/class/ApiController.php';
-
 		$controller = new ApiController();
 		$controller->syncfeeds();
 
@@ -362,7 +358,7 @@ function is_php_cli() {
 }
 if( is_php_cli() ) {
 
-	require_once __DIR__ . '/bootstrap.php';
+	require __DIR__ . '/bootstrap.php';
 
 	if( isset($argv[1]) ) {
 

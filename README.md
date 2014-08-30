@@ -3,8 +3,8 @@ Shaarli REST API
 
 ## Installation
 * Create mysql database shaarli-api
-* Install database schema /database/mysql_schema.sql
-* Set database connection string in /bootstrap.php
+* Copy `config.php.dist` into `config.php` and setup your own settings.
+* Run `composer install` (https://getcomposer.org/download/)
 * Run: php cron.php
 
 ### Requirements
@@ -24,6 +24,8 @@ cd shaarli-api
 # Copy `config.php.dist` into `config.php` and setup your own settings.
 cp config.php.dist config.php
 nano config.php
+# Run composer install
+composer install
 # Run cron
 php cron.php
 ```

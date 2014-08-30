@@ -1,4 +1,6 @@
-cache/*.*
+/cache/
+/vendor/
 favicon/*.ico
-*.log
+composer.lock
 config.php
+*.log

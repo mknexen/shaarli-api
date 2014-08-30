@@ -57,6 +57,20 @@ class ShaarliApi {
 			$entries->select_expr('(SELECT COUNT(1) FROM entries AS e2 WHERE entries.permalink=e2.permalink) AS shares');
 		}
 
+		// Filter by feed ids
+		if( isset($arguments['ids']) && !empty($arguments['ids']) && is_array($arguments['ids']) ) {
+
+			foreach($arguments['ids'] as $id){
+
+				if( !is_numeric($id) ) {
+
+					throw new \Exception("Error Processing Request");	
+				}
+			}
+
+			$entries->where_in('feeds.id', $arguments['ids'] );
+		}
+
 		// Limit
 		if( isset($arguments['limit']) && $arguments['limit'] >= 5 && $arguments['limit'] <= 50 ) {
 			$entries->limit( (int) $arguments['limit'] );
@@ -527,5 +541,3 @@ class ShaarliApi {
 		}		
 	}
 }
-
-class ShaarliApiException extends Exception {}

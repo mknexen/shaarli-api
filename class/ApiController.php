@@ -56,10 +56,14 @@ class ApiController extends AbstractApiController {
 				// Execute the action
 				$results = $api->$action( $arguments );
 
-			} catch (Exception $e) {
+			} catch (ShaarliApiException $e) {
 
 				$this->error( $e->getMessage() );
-			}			
+
+			} catch (\Exception $e) {
+
+				exit();
+			}
 		}
 		else {
 

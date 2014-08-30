@@ -261,7 +261,7 @@ class CronController {
 
 			if( $feed->link != null ) {
 
-				$service = 'http://g.etfv.co/' . urlencode($feed->link); // it's google app engine service, fuck!
+				$service = 'http://www.google.com/s2/favicons?domain='.urlencode($feed->link); // google service, fuck! =)
 
 				$this->verbose('Downloading favicon: ' . $feed->link);
 

@@ -2,15 +2,17 @@
 
 /**
  * Shaarli REST API
- * @version 1.0 alpha
- * @authors:
- * 	nexen (nexen@dukgo.com, nexen@irc.freenode.net#debian, https://nexen.mkdir.fr/shaarli)
  */
+
+$configFile = __DIR__.'/config.php';
+
+if( !file_exists('config.php') )
+	exit('Please setup your config.php');
 
 require_once __DIR__ . '/vendor/idiorm.php';
 require_once __DIR__ . '/vendor/paris.php';
 require_once __DIR__ . '/class/models.php';
-require_once __DIR__ . '/config.php';
+require_once $configFile;
 
 
 /**

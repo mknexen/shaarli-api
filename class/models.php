@@ -8,15 +8,17 @@ class ModelBase extends Model {
 	/**
 	 * Get model factory
 	 */
-	public static function factory($remove = null, $strict_error = null) {
-		return Model::factory(get_called_class());
+	public static function factory( $class_name=null, $connection_name=null ) {
+
+		return Model::factory( get_called_class() );
 	}
 
 	/**
 	 * Create new model
 	 */
 	public static function create() {
-		return Model::factory(get_called_class())->create();
+
+		return Model::factory( get_called_class() )->create();
 	}
 }
 

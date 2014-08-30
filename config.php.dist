@@ -7,7 +7,7 @@
  *
  * @author: nexen
  *   mail: nexen@openmailbox.org
- *	 irc: nexen irc.freenode.net #debian
+ *   irc: nexen irc.freenode.net #debian
  *
  * @contributors:
  *   ArthurHoaro (https://github.com/ArthurHoaro)
@@ -16,4 +16,4 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'shaarli-api');
 define('DB_USER', 'shaarli-api');
-define('DB_PASSWD', 'shaarli-api');
+define('DB_PASS', 'shaarli-api');

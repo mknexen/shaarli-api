@@ -15,25 +15,34 @@ class ShaarliApi {
 
 			$feeds->select_expr('feeds.*');
 		}
-
 		// Disabled feeds
 		elseif( isset($arguments['disabled']) && $arguments['disabled'] == 1 ) {
 
 			$feeds->where('enabled', 0);
 		}
-
 		// Feeds with error
 		elseif( isset($arguments['error']) && $arguments['error'] == 1 ) {
 
 			$feeds->where_not_null('error');
 		}
-
 		// Active feeds
 		else {
 
 			$feeds->select_expr('id, url, link, title');
 			$feeds->where_null('error');
 			$feeds->where('enabled', 1);			
+		}
+
+		// Filter by feed ids
+		if( isset($arguments['ids']) && !empty($arguments['ids']) && is_array($arguments['ids']) ) {
+
+			foreach($arguments['ids'] as $id){
+				if( !is_numeric($id) ) {
+					throw new \Exception("Error Processing Request");	
+				}
+			}
+
+			$feeds->where_in('id', $arguments['ids'] );
 		}
 
 		return $feeds->findArray();
@@ -61,9 +70,7 @@ class ShaarliApi {
 		if( isset($arguments['ids']) && !empty($arguments['ids']) && is_array($arguments['ids']) ) {
 
 			foreach($arguments['ids'] as $id){
-
 				if( !is_numeric($id) ) {
-
 					throw new \Exception("Error Processing Request");	
 				}
 			}
@@ -237,6 +244,18 @@ class ShaarliApi {
 			else {
 
 				$entries->where_raw('(entries.title LIKE ? OR entries.content LIKE ?)', array($term, $term)); // security: possible injection?
+			}
+
+			// Filter by feed ids
+			if( isset($arguments['ids']) && !empty($arguments['ids']) && is_array($arguments['ids']) ) {
+
+				foreach($arguments['ids'] as $id){
+					if( !is_numeric($id) ) {
+						throw new \Exception("Error Processing Request");	
+					}
+				}
+
+				$entries->where_in('feeds.id', $arguments['ids'] );
 			}
 
 			$entries = $entries->findArray();

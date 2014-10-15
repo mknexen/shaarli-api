@@ -228,6 +228,11 @@ class ShaarliApi {
 				$term = preg_replace('/^title\:/', '', $term);
 				$adv_search = 'title';
 			}
+			elseif( preg_match('/^feed\:/i', $term) ) {
+
+				$term = preg_replace('/^feed\:/', '', $term);
+				$adv_search = 'feed';
+			}
 
 			$term = '%' . $term . '%';
 
@@ -241,9 +246,13 @@ class ShaarliApi {
 
 				$entries->where_like('entries.title', $term);
 			}
+			else if ( $adv_search == 'feed' ) {
+			    
+			    $entries->where_like('feeds.title', $term);
+			}
 			else {
 
-				$entries->where_raw('(entries.title LIKE ? OR entries.content LIKE ?)', array($term, $term)); // security: possible injection?
+				$entries->where_raw('(entries.title LIKE ? OR entries.content LIKE ? OR feeds.title LIKE ?)', array($term, $term, $term)); // security: possible injection?
 			}
 
 			// Filter by feed ids

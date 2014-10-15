@@ -23,8 +23,9 @@ define('DB_PASS', 'shaarli-api');
 
 // Favicon directory
 define('FAVICON_DIRECTORY', __DIR__ . '/favicon/');
-
-
+define('FAVICON_DEFAULT', 'default.ico');
+// Reload favicon each month
+define('FAVICON_CACHE_DURATION', 3600*24*30);
 
 
 // Ne toucher à rien après cette ligne si vous ne savez pas se que vous faite =)

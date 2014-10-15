@@ -1,5 +1,7 @@
 <?php
 
+use Favicon\Favicon;
+
 class CronController {
 
 	public $verbose = true;
@@ -354,8 +356,6 @@ class CronController {
 			));
 	}
 }
-
-use Favicon\Favicon;
 
 function is_php_cli() {
 	return function_exists('php_sapi_name') && php_sapi_name() === 'cli';

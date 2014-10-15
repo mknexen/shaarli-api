@@ -365,8 +365,8 @@ if( is_php_cli() ) {
 	require __DIR__ . '/bootstrap.php';
 	
 	// Let's not break everything if new config isn't set
-    if( !defined('FAVICON_DEFAULT') ) { define('FAVICON_DEFAULT', 'default.ico'); }
-    if( !defined('FAVICON_DEFAULT') ) { define('FAVICON_CACHE_DURATION', 3600*24*30); }
+	if( !defined('FAVICON_DEFAULT') ) { define('FAVICON_DEFAULT', 'default.ico'); }
+	if( !defined('FAVICON_CACHE_DURATION') ) { define('FAVICON_CACHE_DURATION', 3600*24*30); }
 
 	if( isset($argv[1]) ) {
 

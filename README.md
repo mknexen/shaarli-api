@@ -7,13 +7,19 @@ Shaarli REST API
 * Run `composer install` (https://getcomposer.org/download/)
 * Run: php cron.php
 
-### Requirements
+## Requirements
 * PHP 5.4.4
 * MySQL
 * PDO
 * Apache RewriteEngine
 
-### Install via SSH exemple (debian)
+## Update your installation
+* Update your installation via Git (`git update origin master`) or the [archive file](archive/master.zip).
+* Check if there was any changes in [config file](blob/master/config.php.dist), and add settings if necessary.
+* Update external libraries with [Composer](https://getcomposer.org/download/). Run: `composer update`.
+* Run cron the finalize the update: `php cron.php`.
+
+## Install via SSH exemple (debian)
 ```
 cd /var/www
 # Clone repo
@@ -30,7 +36,7 @@ composer install
 php cron.php
 ```
 
-### API Usage
+## API Usage
 * /feeds La liste des shaarlis
 * /latest Les derniers billets
 * /top Les liens les plus partagés
@@ -38,11 +44,11 @@ php cron.php
 * /discussion Rechercher une discussion
 * /syncfeeds Synchroniser la liste des shaarlis
 
-### Options
+## Options
 * &format=json
 * &pretty=true
 
-### Samples
+## Samples
 * Obtenir la liste des flux actifs: http://nexen.mkdir.fr/shaarli-api/feeds?pretty=1
 * Obtenir la liste complète des flux: http://nexen.mkdir.fr/shaarli-api/feeds?full=1&pretty=1
 * Obtenir les derniers billets http://nexen.mkdir.fr/shaarli-api/latest?pretty=1

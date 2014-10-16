@@ -1,5 +1,7 @@
 <?php
 
+use Favicon\Favicon;
+
 class CronController {
 
 	public $verbose = true;
@@ -255,20 +257,22 @@ class CronController {
 
 		$favicon = FAVICON_DIRECTORY . $feed->id . '.ico';
 
-		if( !file_exists($favicon) ) {
+		if( (!file_exists($favicon) || (time() - filemtime($favicon)) > FAVICON_CACHE_DURATION) && $feed->link != null ) {
+			$favService = new Favicon();
 
-			if( $feed->link != null ) {
+			$this->verbose('Downloading favicon for link #'. $feed->id .': ' . $feed->link);
+			
+			if( $favUrl = $favService->get($feed->link) ) {
+				$favRequest = $this->makeRequest($favUrl);
 
-				$service = 'http://www.google.com/s2/favicons?domain='.urlencode($feed->link); // google service, fuck! =)
+				if( $favRequest['info']['http_code'] == 200 && !empty($favRequest['html']) ) {
 
-				$this->verbose('Downloading favicon: ' . $feed->link);
-
-				$request = $this->makeRequest($service);
-
-				if( $request['info']['http_code'] == 200 && !empty($request['html']) ) {
-
-					file_put_contents($favicon, $request['html']);
+					file_put_contents($favicon, $favRequest['html']);
 				}
+			}
+			
+			if( !file_exists($favicon) || !filesize($favicon) ) {
+			    copy( FAVICON_DIRECTORY . FAVICON_DEFAULT, $favicon );
 			}
 		}
 	}
@@ -359,6 +363,10 @@ function is_php_cli() {
 if( is_php_cli() ) {
 
 	require __DIR__ . '/bootstrap.php';
+	
+	// Let's not break everything if new config isn't set
+    if( !defined('FAVICON_DEFAULT') ) { define('FAVICON_DEFAULT', 'default.ico'); }
+    if( !defined('FAVICON_DEFAULT') ) { define('FAVICON_CACHE_DURATION', 3600*24*30); }
 
 	if( isset($argv[1]) ) {
 

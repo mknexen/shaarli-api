@@ -1,6 +1,7 @@
 /cache/
 /vendor/
 favicon/*.ico
+!favicon/default.ico
 composer.lock
 config.php
 *.log

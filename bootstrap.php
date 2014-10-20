@@ -6,7 +6,7 @@
 
 $configFile = __DIR__.'/config.php';
 
-if( !file_exists('config.php') )
+if( !file_exists($configFile) )
 	exit('Please setup your config.php');
 
 require $configFile;

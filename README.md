@@ -40,7 +40,7 @@ php cron.php
 ```
 location /shaarli-api {
     if (!-e $request_filename) {
-       rewrite ^(/shaarli-api)(.*)$ $1/index.php/$2;
+       rewrite ^(/shaarli-api)/(.*)$ $1/index.php/$2;
     }
 }
 

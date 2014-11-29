@@ -3,13 +3,16 @@ Shaarli REST API
 
 ## Installation
 * Create mysql database shaarli-api
+* cd shaarli-api
 * Copy `config.php.dist` into `config.php` and setup your own settings.
-* Run `composer install` (https://getcomposer.org/download/)
+* # Run `composer install` (https://getcomposer.org/download/)
+* php -r "readfile('https://getcomposer.org/installer');" | php
+* php composer.phar install
 * Run: php cron.php
-
+  
 ## Requirements
 * PHP 5.4.4
-* MySQL
+* MySQL or Sqlite
 * PDO
 * Apache RewriteEngine
 
@@ -31,7 +34,8 @@ cd shaarli-api
 cp config.php.dist config.php
 nano config.php
 # Run composer install
-composer install
+php -r "readfile('https://getcomposer.org/installer');" | php
+php composer.phar install
 # Run cron
 php cron.php
 ```

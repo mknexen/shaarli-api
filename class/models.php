@@ -74,7 +74,7 @@ class Feed extends ModelBase {
 			}
 
 			$count = self::factory()
-				->where_raw('url = ? OR url = ? OR url LIKE ?', array($http, $https, '%' . $parts['host'] . '%')) // Retrict one shaarli per domain to avoid malformed urls => TODO: format url correctly
+				->where_raw('url = ? OR url = ? OR url LIKE ?', array($http, $https, '%' . $parts['host'].$parts['path'] . '%')) // Retrict one shaarli per domain to avoid malformed urls => TODO: format url correctly
 				->count();
 
 			return $count > 0;

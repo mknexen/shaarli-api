@@ -78,7 +78,7 @@ class CronController {
 	public function fetchAll() {
 		if(DB_TYPE=="sqlite"){
 			$feeds = Feed::factory()
-					->where_raw("(fetched_at IS NULL OR fetched_at < date('now', fetch_interval * -1))")
+					->where_raw("(fetched_at IS NULL OR fetched_at < strftime('%Y-%m-%d %H:%M:%S', 'now','-1 minute'))")
 					->where('enabled', 1)
 					->findMany();
 		}elseif(DB_TYPE=="mysql"){

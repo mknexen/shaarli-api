@@ -1,7 +1,3 @@
--- PRAGMA synchronous = OFF;
--- PRAGMA journal_mode = MEMORY;
--- BEGIN TRANSACTION;
-
 CREATE TABLE IF NOT EXISTS `feeds` (
   `id` INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT ,
   `url` varchar(255) NOT NULL,
@@ -16,6 +12,8 @@ CREATE TABLE IF NOT EXISTS `feeds` (
   UNIQUE (`url`)
   );
 
+-- next query
+
 CREATE TABLE IF NOT EXISTS `entries` (
   `id` INTEGER UNIQUE PRIMARY KEY AUTOINCREMENT ,
   `date` timestamp NULL DEFAULT NULL,
@@ -28,8 +26,3 @@ CREATE TABLE IF NOT EXISTS `entries` (
   `feed_id` int(10)  NOT NULL,
    FOREIGN KEY (`feed_id`) REFERENCES `feeds` (`id`) ON DELETE CASCADE
   );
-
--- CREATE INDEX "_" ON "" (`feed_id`);
--- CREATE INDEX "_" ON "" (`url`);
--- CREATE INDEX "_" ON "" (`feed_id`);
--- END TRANSACTION;

@@ -23,16 +23,25 @@ class CronController {
 
 				if(DB_TYPE=="sqlite"){
 					$scheme = __DIR__ . '/database/sqlite_schema.sql';
+					if( file_exists($scheme) ) {
+						$scheme = file_get_contents( $scheme );
+						foreach(explode("-- next query", $scheme) as $query){
+							// je ne sais pas pourquoi mais avec sqlite, 
+							// il n'y a que 1 requête d'exécuté
+							// donc je fais une boucle sur chaque requête
+							ORM::for_table('')->raw_execute( $query );
+						}
+					}
 				}elseif(DB_TYPE=="mysql"){
 					$scheme = __DIR__ . '/database/mysql_schema.sql';
+					if( file_exists($scheme) ) {
+						$scheme = file_get_contents( $scheme );
+						ORM::for_table('')->raw_execute( $scheme );
+					}
 				}else{
 					die("Error in config.php. DB_TYPE is not sqlite or mysql");
 				}
-				if( file_exists($scheme) ) {
-					$scheme = file_get_contents( $scheme );
-
-					ORM::for_table('')->raw_execute( $scheme );
-				}
+				
 			}
 		}
 

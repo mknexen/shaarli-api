@@ -16,10 +16,11 @@
 /**
  * Database configuration
  */
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'shaarli-api');
-define('DB_USER', 'shaarli-api');
-define('DB_PASS', 'shaarli-api');
+define('DB_TYPE', 'mysql'); /* sqlite or mysql */
+define('DB_HOST', 'localhost'); // only for mysql
+define('DB_NAME', 'shaarli-api'); // only for mysql
+define('DB_USER', 'shaarli-api'); // only for mysql
+define('DB_PASS', 'shaarli-api'); // only for mysql
 
 // Favicon directory
 define('FAVICON_DIRECTORY', __DIR__ . '/favicon/');

@@ -21,8 +21,13 @@ class CronController {
 
 				$this->verbose('Empty database! Creating tables...');
 
-				$scheme = __DIR__ . '/database/mysql_schema.sql';
-
+				if(DB_TYPE=="sqlite"){
+					$scheme = __DIR__ . '/database/sqlite_schema.sql';
+				}elseif(DB_TYPE=="mysql"){
+					$scheme = __DIR__ . '/database/mysql_schema.sql';
+				}else{
+					die("Error in config.php. DB_TYPE is not sqlite or mysql");
+				}
 				if( file_exists($scheme) ) {
 
 					$scheme = file_get_contents( $scheme );

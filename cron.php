@@ -17,7 +17,7 @@ class CronController {
 
 		} catch (Exception $e) {
 			
-			if( $e->getCode() == '42S02' ) {
+			if( in_array($e->getCode(), array('42S02', 'HY000') )) {
 
 				$this->verbose('Empty database! Creating tables...');
 
@@ -29,12 +29,11 @@ class CronController {
 					die("Error in config.php. DB_TYPE is not sqlite or mysql");
 				}
 				if( file_exists($scheme) ) {
-
 					$scheme = file_get_contents( $scheme );
 
-					ORM::for_table('')->raw_execute( $scheme );					
+					ORM::for_table('')->raw_execute( $scheme );
 				}
-			};
+			}
 		}
 
 		try {
@@ -68,11 +67,19 @@ class CronController {
 	 * Fetch all feeds
 	 */
 	public function fetchAll() {
-
-		$feeds = Feed::factory()
+		if(DB_TYPE=="sqlite"){
+			$feeds = Feed::factory()
+					->where_raw("(fetched_at IS NULL OR fetched_at < date('now', fetch_interval * -1))")
+					->where('enabled', 1)
+					->findMany();
+		}elseif(DB_TYPE=="mysql"){
+			$feeds = Feed::factory()
 					->where_raw('(fetched_at IS NULL OR fetched_at < ADDDATE(NOW(), INTERVAL (fetch_interval * -1) MINUTE))')
 					->where('enabled', 1)
 					->findMany();
+		}else{
+			die("Error in config.php. DB_TYPE is not sqlite or mysql");
+		}		
 
 		if( $feeds != null ) {
 

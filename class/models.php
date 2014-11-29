@@ -44,7 +44,13 @@ class Feed extends ModelBase {
 	 * Set feed as fetched
 	 */
 	public function fetched() {
-		$this->set_expr('fetched_at', 'NOW()');
+		if(DB_TYPE=="sqlite"){
+			$this->set_expr('fetched_at', "datetime('NOW')");
+		}elseif(DB_TYPE=="mysql"){
+			$this->set_expr('fetched_at', 'NOW()');
+		}else{
+			die("Error in config.php. DB_TYPE is not sqlite or mysql");
+		}
 	}
 
 	/**

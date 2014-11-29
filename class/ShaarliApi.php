@@ -130,23 +130,47 @@ class ShaarliApi {
 						->group_by('permalink')
 						->having_gt('count', 1);
 
-				switch ($arguments['interval']) {
-					case '12h':					
-						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -12 HOUR)');
-						break;
-					case '24h':					
-						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -24 HOUR)');
-						break;
-					case '48h':
-						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -48 HOUR)');
-						break;
-					case '1month':					
-						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
-						break;
-					case '3month':					
-						$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
-						break;
+				if(DB_TYPE=="sqlite"){
+					switch ($arguments['interval']) {
+						case '12h':					
+							$entries->where_raw("date > date('now', '-12 hour')");
+							break;
+						case '24h':					
+							$entries->where_raw("date > date('now', '-24 hour')");
+							break;
+						case '48h':
+							$entries->where_raw("date > date('now', '-48 hour')");
+							break;
+						case '1month':					
+							$entries->where_raw("date > date('now', '-1 month')");
+							break;
+						case '3month':					
+							$entries->where_raw("date > date('now', '-3 month')");
+							break;
+					}
+				}elseif(DB_TYPE=="mysql"){
+					switch ($arguments['interval']) {
+						case '12h':					
+							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -12 HOUR)');
+							break;
+						case '24h':					
+							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -24 HOUR)');
+							break;
+						case '48h':
+							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -48 HOUR)');
+							break;
+						case '1month':					
+							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
+							break;
+						case '3month':					
+							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
+							break;
+					}
+				}else{
+					die("Error in config.php. DB_TYPE is not sqlite or mysql");
 				}
+
+				
 
 				return $entries->findArray();				
 			}

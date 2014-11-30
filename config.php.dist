@@ -54,8 +54,10 @@ function shaarli_api_nodes() {
 function shaarli_opml_files() {
 	return array(
 		// Oros OPML
-		'https://ecirtam.net/shaarlirss/custom/people.opml', 
+		'https://ecirtam.net/find_shaarlis/out/shaarlis.opml',
 		// shaarli.fr OPML
 		'https://shaarli.fr/opml.php?mod=opml',
+		// shaarlis_list ( https://github.com/Oros42/shaarlis_list )
+		'https://raw.githubusercontent.com/Oros42/shaarlis_list/master/shaarlis.opml'
 	);
 }

@@ -31,6 +31,8 @@ class CronController {
 							// donc je fais une boucle sur chaque requête
 							ORM::for_table('')->raw_execute( $query );
 						}
+						$db = ORM::get_db();
+						$db->exec('PRAGMA journal_mode=WAL;');
 					}
 				}elseif(DB_TYPE=="mysql"){
 					$scheme = __DIR__ . '/database/mysql_schema.sql';

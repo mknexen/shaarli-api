@@ -56,6 +56,6 @@ function shaarli_opml_files() {
 		'https://raw.githubusercontent.com/Oros42/shaarlis_list/master/shaarlis.opml',
 		/* ou 'https://ecirtam.net/find_shaarlis/out/shaarlis.opml' */
 		// shaarli.fr OPML
-		'https://shaarlo.fr/opml.php?mod=opml',
+		'https://shaarlo.fr/opml.php?mod=opml'
 	);
 }

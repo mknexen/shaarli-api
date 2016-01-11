@@ -36,7 +36,6 @@ define('FAVICON_CACHE_DURATION', 3600*24*30);
 /**
  * Sync configuration
  */
-// TODO ajouter la recherche de liste sur https://github.com/Oros42/find_shaarlis
 
 // Synchronisation de la liste des shaarlis avec d'autre shaarli-api ou export au format JSON
 function shaarli_api_nodes() {
@@ -54,8 +53,9 @@ function shaarli_api_nodes() {
 function shaarli_opml_files() {
 	return array(
 		// Oros OPML
-		'https://ecirtam.net/shaarlirss/custom/people.opml', 
+		'https://raw.githubusercontent.com/Oros42/shaarlis_list/master/shaarlis.opml',
+		/* ou 'https://ecirtam.net/find_shaarlis/out/shaarlis.opml' */
 		// shaarli.fr OPML
-		'https://shaarli.fr/opml.php?mod=opml',
+		'https://shaarlo.fr/opml.php?mod=opml',
 	);
 }

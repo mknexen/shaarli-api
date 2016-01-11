@@ -5,7 +5,7 @@
  */
 class ShaarliApiClient {
 
-	public $url = 'https://nexen.mkdir.fr/shaarli-api/';
+	public $url = 'https://shaarli-api.ecirtam.net/';
 
 	/** 
 	 * Constructor

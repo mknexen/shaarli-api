@@ -21,6 +21,10 @@ require __DIR__.'/vendor/autoload.php';
 if(DB_TYPE=="sqlite"){
 	// sqlite
 	ORM::configure('sqlite:./database/database.db');
+	ORM::configure('caching', true);
+	ORM::configure('caching_auto_clear', true);
+	$db = ORM::get_db();
+	$db->exec('PRAGMA journal_mode=WAL');
 }elseif(DB_TYPE=="mysql"){
 	// mysql
 	ORM::configure('mysql:host='. DB_HOST .';dbname='. DB_NAME);

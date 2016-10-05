@@ -1,7 +1,7 @@
 <?php
 
 class ShaarliApi {
-	
+
 	/**
 	 * Feeds list
 	 * @route /feeds
@@ -30,7 +30,7 @@ class ShaarliApi {
 
 			$feeds->select_expr('id, url, link, title');
 			$feeds->where_null('error');
-			$feeds->where('enabled', 1);			
+			$feeds->where('enabled', 1);
 		}
 
 		// Filter by feed ids
@@ -38,7 +38,7 @@ class ShaarliApi {
 
 			foreach($arguments['ids'] as $id){
 				if( !is_numeric($id) ) {
-					throw new \Exception("Error Processing Request");	
+					throw new \Exception("Error Processing Request");
 				}
 			}
 
@@ -71,7 +71,7 @@ class ShaarliApi {
 
 			foreach($arguments['ids'] as $id){
 				if( !is_numeric($id) ) {
-					throw new \Exception("Error Processing Request");	
+					throw new \Exception("Error Processing Request");
 				}
 			}
 
@@ -93,7 +93,7 @@ class ShaarliApi {
 			foreach( $entries as &$entry ) {
 
 				$entry['feed']['id'] = $entry['feed_id'];
-				$entry['feed']['url'] = $entry['feed_url'];				
+				$entry['feed']['url'] = $entry['feed_url'];
 				$entry['feed']['link'] = $entry['feed_link'];
 				$entry['feed']['title'] = $entry['feed_title'];
 
@@ -132,37 +132,37 @@ class ShaarliApi {
 
 				if(DB_TYPE=="sqlite"){
 					switch ($arguments['interval']) {
-						case '12h':					
+						case '12h':
 							$entries->where_raw("date > date('now', '-12 hour')");
 							break;
-						case '24h':					
+						case '24h':
 							$entries->where_raw("date > date('now', '-24 hour')");
 							break;
 						case '48h':
 							$entries->where_raw("date > date('now', '-48 hour')");
 							break;
-						case '1month':					
+						case '1month':
 							$entries->where_raw("date > date('now', '-1 month')");
 							break;
-						case '3month':					
+						case '3month':
 							$entries->where_raw("date > date('now', '-3 month')");
 							break;
 					}
 				}elseif(DB_TYPE=="mysql"){
 					switch ($arguments['interval']) {
-						case '12h':					
+						case '12h':
 							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -12 HOUR)');
 							break;
-						case '24h':					
+						case '24h':
 							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -24 HOUR)');
 							break;
 						case '48h':
 							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -48 HOUR)');
 							break;
-						case '1month':					
+						case '1month':
 							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
 							break;
-						case '3month':					
+						case '3month':
 							$entries->where_raw('date > ADDDATE(NOW(), INTERVAL -1 MONTH)');
 							break;
 					}
@@ -170,13 +170,12 @@ class ShaarliApi {
 					die("Error in config.php. DB_TYPE is not sqlite or mysql");
 				}
 
-				
 
-				return $entries->findArray();				
+				return $entries->findArray();
 			}
 			else {
 
-				throw new ShaarliApiException('Invalid interval (?interval={' . implode('|', $intervals) . '})');				
+				throw new ShaarliApiException('Invalid interval (?interval={' . implode('|', $intervals) . '})');
 			}
 		}
 		elseif( isset($arguments['date']) && !empty($arguments['date'])) {
@@ -271,7 +270,7 @@ class ShaarliApi {
 				$entries->where_like('entries.title', $term);
 			}
 			else if ( $adv_search == 'feed' ) {
-			    
+
 			    $entries->where_like('feeds.title', $term);
 			}
 			else {
@@ -284,7 +283,7 @@ class ShaarliApi {
 
 				foreach($arguments['ids'] as $id){
 					if( !is_numeric($id) ) {
-						throw new \Exception("Error Processing Request");	
+						throw new \Exception("Error Processing Request");
 					}
 				}
 
@@ -319,12 +318,19 @@ class ShaarliApi {
 	 * @route /random
 	 */
 	public function random( $arguments ) {
-
-		$entries = Feed::factory()
+		if(!empty(DB_TYPE) && DB_TYPE=="sqlite"){
+			$entries = Feed::factory()
 					 ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
 					 ->select_expr('entries.id, date, permalink, entries.title, content, categories')
 					->join('entries', array('entries.feed_id', '=', 'feeds.id'))
-					->order_by_expr('RAND()');
+					->order_by_expr('RANDOM()');
+		}else{
+                        $entries = Feed::factory()
+                                         ->select_expr('feeds.id AS feed_id, feeds.url AS feed_url, feeds.link AS feed_link, feeds.title AS feed_title')
+                                         ->select_expr('entries.id, date, permalink, entries.title, content, categories')
+                                        ->join('entries', array('entries.feed_id', '=', 'feeds.id'))
+                                        ->order_by_expr('RAND()');
+		}
 
 		// Limit
 		if( isset($arguments['limit']) && $arguments['limit'] >= 5 && $arguments['limit'] <= 100 ) {
@@ -341,7 +347,7 @@ class ShaarliApi {
 			foreach( $entries as &$entry ) {
 
 				$entry['feed']['id'] = $entry['feed_id'];
-				$entry['feed']['url'] = $entry['feed_url'];				
+				$entry['feed']['url'] = $entry['feed_url'];
 				$entry['feed']['link'] = $entry['feed_link'];
 				$entry['feed']['title'] = $entry['feed_title'];
 
@@ -438,7 +444,7 @@ class ShaarliApi {
 							}
 							else {
 								$keywords[$categorie] = 1;
-							}							
+							}
 						}
 					}
 				}
@@ -480,7 +486,7 @@ class ShaarliApi {
 						$this->addFeeds( $urls );
 					}
 				}
-			}			
+			}
 		}
 	}
 
@@ -494,7 +500,7 @@ class ShaarliApi {
 
 			foreach( $files as $file ) {
 
-			    $body = file_get_contents($file);	
+			    $body = file_get_contents($file);
 
 			    if( !empty($body) ) {
 
@@ -504,7 +510,6 @@ class ShaarliApi {
 				    $xml = @simplexml_load_string($body);
 
 				    foreach ($xml->body->outline as $value) {
-
 				        $attributes = $value->attributes();
 
 				        $urls[] = $attributes->xmlUrl;
@@ -514,8 +519,8 @@ class ShaarliApi {
 
 						$this->addFeeds( $urls );
 					}
-			    }	
-			}			
+			    }
+			}
 		}
 	}
 
@@ -524,18 +529,14 @@ class ShaarliApi {
 	 * @param array urls
 	 */
 	public function addFeeds( $urls ) {
-
 		if( !empty($urls) ) {
 
 			$urls = array_unique($urls);
-
 			foreach( $urls as $url ) {
-
 				$feed = Feed::create();
 				$feed->url = $url;
 
 				if( !$feed->exists() ) {
-
 					$feed->save();
 				}
 			}
@@ -582,7 +583,7 @@ class ShaarliApi {
 				$feed->fetched_at = null;
 				$feed->save();
 
-				$json['success'] = 1;	
+				$json['success'] = 1;
 			}
 
 			return $json;
@@ -590,6 +591,6 @@ class ShaarliApi {
 		else {
 
 			throw new ShaarliApiException('Need url (?url=url)');
-		}		
+		}
 	}
 }

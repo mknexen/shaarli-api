@@ -9,6 +9,7 @@ class ApiController extends AbstractApiController {
 
 		// Les actions disponible
 		$actions = array(
+			'feed',
 			'feeds',
 			'latest',
 			'top',

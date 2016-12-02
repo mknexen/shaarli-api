@@ -3,6 +3,45 @@
 class ShaarliApi {
 
 	/**
+	 * Get single feed
+	 *
+	 * @route /feed
+	 * @args id={id}
+	 */
+	public function feed( $arguments ) {
+
+		if( isset($arguments['id']) && !empty($arguments['id']) && is_numeric($arguments['id']) && $arguments['id'] > 0 ) {
+
+			$feed = Feed::factory();
+			$feed->where('id', $arguments['id']);
+			$feed = $feed->findArray();
+
+			if( $feed ) {
+
+				$feed = $feed[0];
+
+				$entries = Entry::factory()
+					->where('feed_id', $feed['id'])
+					->order_by_desc('date')
+					->limit(100)
+				;
+
+				$entries = $entries->findArray();
+
+				$feed['entries'] = $entries;
+
+				return $feed;
+			}
+			else {
+				throw new ShaarliApiException('Feed not found');
+			}
+		}
+		else {
+			throw new ShaarliApiException('Need id (?id=id)');
+		}
+	}
+
+	/**
 	 * Feeds list
 	 * @route /feeds
 	 */

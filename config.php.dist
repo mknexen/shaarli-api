@@ -41,10 +41,10 @@ define('FAVICON_CACHE_DURATION', 3600*24*30);
 function shaarli_api_nodes() {
 	return array(
 		// Arthur Hoaro
-		'https://river.hoa.ro/api/'
+		'https://river.hoa.ro/api/feeds'
 
 		// Nexen
-		'https://nexen.netk.fr/shaarli-api/',
+		'https://nexen.netk.fr/shaarli-api/feeds',
 	);
 }
 

@@ -6,6 +6,16 @@ class CronController {
 
 	public $verbose = true;
 
+	private $curl;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+
+		$this->curl = new Curl();
+	}
+
 	/**
 	 * Check database
 	 */
@@ -107,6 +117,7 @@ class CronController {
 
 	/**
 	 * Fetch single feed
+	 *
 	 * @param Feed feed
 	 */
 	public function fetch( Feed $feed ) {
@@ -120,7 +131,7 @@ class CronController {
 		}
 
 		// Execute HTTP Request
-		$request = $this->makeRequest( $feed->url );
+		$request = $this->curl->makeRequest( $feed->url );
 
 		if( $request['info']['http_code'] != 200 ) {
 
@@ -238,7 +249,7 @@ class CronController {
 
 		$url = preg_replace("/^http:/", "https:", $feed->url);
 
-		$request = $this->makeRequest( $url );
+		$request = $this->curl->makeRequest( $url );
 
 		$https_capable = false;
 
@@ -286,7 +297,7 @@ class CronController {
 			$this->verbose('Downloading favicon for link #'. $feed->id .': ' . $feed->link);
 			
 			if( $favUrl = $favService->get($feed->link) ) {
-				$favRequest = $this->makeRequest($favUrl);
+				$favRequest = $this->curl->makeRequest($favUrl);
 
 				if( $favRequest['info']['http_code'] == 200 && !empty($favRequest['html']) ) {
 
@@ -317,53 +328,6 @@ class CronController {
 
 	protected function countFeeds() {
 		return Feed::factory()->count();
-	}
-
-	/**
-	 * Make http request and return html content
-	 */
-	public function makeRequest( $url ) {
-
-		if( function_exists('curl_init') ) {
-
-			$ch = curl_init();
-
-			$options = array(
-				CURLOPT_URL => $url,
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_HEADER => false,
-				CURLOPT_AUTOREFERER => false,
-				CURLOPT_FOLLOWLOCATION => true,
-				CURLOPT_MAXREDIRS => 5,
-				CURLOPT_CONNECTTIMEOUT => 15,
-				CURLOPT_TIMEOUT => 30,
-				CURLOPT_SSL_VERIFYPEER => false,
-				CURLOPT_SSL_VERIFYHOST => false,
-				CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-				CURLOPT_ENCODING => 'gzip',
-				CURLOPT_HTTPHEADER => array(
-	                'User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0',
-	                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-	                'Accept-Language: fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
-	                'Accept-Encoding: gzip, deflate',
-	                'DNT: 1',
-	                'Connection: keep-alive',
-	                'Upgrade-Insecure-Requests: 1',
-				),
-			);
-
-			curl_setopt_array($ch, $options);
-
-			$html = curl_exec($ch);
-			$error = curl_error($ch);
-			$errno = curl_errno($ch);
-			$info = curl_getinfo($ch);
-
-			return compact('html', 'error', 'errno', 'info');
-		}
-		else {
-			throw new Exception("php-curl is required", 1);
-		}
 	}
 
 	/**

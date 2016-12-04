@@ -503,9 +503,11 @@ class ShaarliApi {
 
 		if( !empty($nodes) ) {
 
+			$curl = new Curl();
+
 			foreach( $nodes as $node ) {
 
-				$content = file_get_contents($node);
+				$content = $curl->getContent($node);
 				$rows = json_decode($content);
 
 				if( !empty($rows) ) {
@@ -537,9 +539,11 @@ class ShaarliApi {
 
 		if( !empty($files) ) {
 
+			$curl = new Curl();
+
 			foreach( $files as $file ) {
 
-			    $body = file_get_contents($file);
+			    $body = $curl->getContent($file);
 
 			    if( !empty($body) ) {
 

@@ -192,12 +192,22 @@ class CronController {
 
 			if( !$entry->exists() ) {
 
+				// Title
 				$entry->title = $item->get_title();
+				if( strlen($entry->title) > 255 ) $entry->title = substr($entry->title, 0, 255);
+
+				// Permalink
 				$entry->permalink = htmlspecialchars_decode($item->get_permalink());
+				if( strlen($entry->permalink) > 255 ) $entry->permalink = substr($entry->permalink, 0, 255);
+
+				// Content
 				$entry->content = $item->get_content();
+
+				// Date
 				$entry->date = $item->get_date('Y-m-d H:i:s');
 				if( $entry->date == null ) $entry->date = date('Y-m-d H:i:s');
 
+				// Categories
 				$categories = $item->get_categories();
 
 				if( !empty($categories) ) {

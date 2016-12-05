@@ -41,7 +41,7 @@ define('FAVICON_CACHE_DURATION', 3600*24*30);
 function shaarli_api_nodes() {
 	return array(
 		// Arthur Hoaro
-		'https://river.hoa.ro/api/feeds'
+		'https://river.hoa.ro/api/feeds',
 
 		// Nexen
 		'https://nexen.netk.fr/shaarli-api/feeds',
@@ -57,6 +57,6 @@ function shaarli_opml_files() {
 		// 'https://ecirtam.net/find_shaarlis/out/shaarlis.opml',
 
 		// shaarli.fr OPML
-		'https://shaarlo.fr/opml.php?mod=opml'
+		'https://shaarlo.fr/opml.php?mod=opml',
 	);
 }

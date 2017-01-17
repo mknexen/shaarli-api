@@ -1,8 +1,8 @@
 {
     "require": {
-        "simplepie/simplepie": "dev-master",
-        "j4mie/paris": "dev-master",
-        "arthurhoaro/favicon": "dev-master"
+        "simplepie/simplepie": "^1.4",
+        "j4mie/paris": "^1.5",
+        "arthurhoaro/favicon": "^1.1"
     },
     "autoload": {
         "files": [

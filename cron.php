@@ -116,6 +116,13 @@ class CronController
     {
         $this->verbose('Fetching: ' . $feed->url);
 
+        // Strip index.php
+        if (stripos($feed->url, 'index.php')) {
+            $feed->setUrl($feed->url);
+
+            $this->verbose('Strip index.php: ' . $feed->url);
+        }
+
         // Check HTTPS capability
         if ($feed->https == null) {
             $this->checkHttpsCapability($feed);
@@ -373,8 +380,7 @@ if (is_php_cli()) {
                     sleep(30);
                 }
             }
-        }
-        elseif ($argv[1] == '--sync') { // sync feeds
+        } elseif ($argv[1] == '--sync') { // sync feeds
 
             $controller = new CronController();
             $controller->syncFeeds();

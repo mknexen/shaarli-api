@@ -523,7 +523,7 @@ class ShaarliApi
             $urls = array_unique($urls);
             foreach ($urls as $url) {
                 $feed = Feed::create();
-                $feed->url = $url;
+                $feed->setUrl($url);
 
                 if (!$feed->exists()) {
                     $feed->save();

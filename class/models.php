@@ -36,7 +36,10 @@ class Feed extends ModelBase
     public function setUrl($url)
     {
         $url = trim($url);
-        // $url = str_replace('//', '/', $url);
+
+        // Strip index.php
+        $url = str_replace('/index.php', '', $url);
+        $url = str_replace('/index.php5', '', $url);
 
         $this->url = $url;
     }

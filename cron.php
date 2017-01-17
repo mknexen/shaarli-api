@@ -374,6 +374,11 @@ if (is_php_cli()) {
                 }
             }
         }
+        elseif ($argv[1] == '--sync') { // sync feeds
+
+            $controller = new CronController();
+            $controller->syncFeeds();
+        }
     } else { // standard mode
 
         $controller = new CronController();

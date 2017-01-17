@@ -92,11 +92,13 @@ class CronController {
 			$feeds = Feed::factory()
 					->where_raw("(fetched_at IS NULL OR fetched_at < strftime('%Y-%m-%d %H:%M:%S', 'now','-1 minute'))")
 					->where('enabled', 1)
+					->order_by_asc('fetched_at')
 					->findMany();
 		}elseif(DB_TYPE=="mysql"){
 			$feeds = Feed::factory()
 					->where_raw('(fetched_at IS NULL OR fetched_at < ADDDATE(NOW(), INTERVAL (fetch_interval * -1) MINUTE))')
 					->where('enabled', 1)
+					->order_by_asc('fetched_at')
 					->findMany();
 		}else{
 			die("Error in config.php. DB_TYPE is not sqlite or mysql");

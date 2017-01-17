@@ -84,6 +84,11 @@ class ShaarliApi {
 			$feeds->where_in('id', $arguments['ids'] );
 		}
 
+		if( isset($arguments['count']) && $arguments['count'] == 1 ) {
+
+			return array('count' => $feeds->count());
+		}
+
 		return $feeds->findArray();
 	}
 

@@ -9,7 +9,7 @@ Shaarli REST API
 * php -r "readfile('https://getcomposer.org/installer');" | php
 * php composer.phar install
 * Run: php cron.php
-  
+
 ## Requirements
 * PHP 5.4.4
 * MySQL or Sqlite
@@ -53,9 +53,11 @@ php cron.php
 * &pretty=true
 
 ## Samples
-* Obtenir la liste des flux actifs: http://nexen.netk.fr/shaarli-api/feeds?pretty=1
-* Obtenir la liste complète des flux: http://nexen.netk.fr/shaarli-api/feeds?full=1&pretty=1
-* Obtenir les derniers billets http://nexen.netk.fr/shaarli-api/latest?pretty=1
-* Obtenir le top des liens partagés depuis 48h: http://nexen.netk.fr/shaarli-api/top?interval=48h&pretty=1
-* Faire une recherche sur php: http://nexen.netk.fr/shaarli-api/search?q=php&pretty=1
-* Rechercher une discution sur un lien: http://nexen.netk.fr/shaarli-api/discussion?url=https://nexen.netk.fr/shaarli-river/index.php&pretty=1
+* Obtenir la liste des flux actifs: https://nexen.netk.fr/shaarli-api/feeds?pretty=1
+* Obtenir la liste complète des flux: https://nexen.netk.fr/shaarli-api/feeds?full=1&pretty=1
+* Obtenir le nombre de flux actifs: https://nexen.netk.fr/shaarli-api/feeds?count=1&pretty=1
+* Obtenir les billets d'un seul flux: https://nexen.netk.fr/shaarli-api/feed?id=1&pretty=1
+* Obtenir les derniers billets https://nexen.netk.fr/shaarli-api/latest?pretty=1
+* Obtenir le top des liens partagés depuis 48h: https://nexen.netk.fr/shaarli-api/top?interval=48h&pretty=1
+* Faire une recherche sur php: https://nexen.netk.fr/shaarli-api/search?q=php&pretty=1
+* Rechercher une discution sur un lien: https://nexen.netk.fr/shaarli-api/discussion?url=https://nexen.netk.fr/shaarli-river/index.php&pretty=1

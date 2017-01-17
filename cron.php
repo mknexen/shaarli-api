@@ -133,8 +133,11 @@ class CronController
 
         if ($request['info']['http_code'] != 200) {
             $feed->error = '[ERROR HTTP CODE ' . $request['info']['http_code'] . ']';
-            $feed->fetch_interval = 60;
+            $feed->fetch_interval += 60;
             $feed->fetched();
+            if ($feed->fetch_interval > (60*24*7)) { // Déactive le flux au bout de 7 jours
+                $feed->enable = 0;
+            }
             $feed->save();
 
             $this->verbose('Error Fetching: ' . $feed->url);
@@ -143,7 +146,10 @@ class CronController
         }
         if (empty($request['html'])) {
             $feed->error = '[ERROR SERVER RETURN EMPTY CONTENT]';
-            $feed->fetch_interval = 60;
+            $feed->fetch_interval += 60;
+            if ($feed->fetch_interval > (60*24*7)) { // Déactive le flux au bout de 7 jours
+                $feed->enable = 0;
+            }
             $feed->fetched();
             $feed->save();
 

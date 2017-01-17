@@ -35,13 +35,7 @@ class Feed extends ModelBase
      */
     public function setUrl($url)
     {
-        $url = trim($url);
-
-        // Strip index.php
-        $url = str_replace('/index.php', '', $url);
-        $url = str_replace('/index.php5', '', $url);
-
-        $this->url = $url;
+        $this->url = static::formatUrl($url);
     }
 
     /**
@@ -87,6 +81,42 @@ class Feed extends ModelBase
         } else {
             throw new Exception("empty url", 1);
         }
+    }
+
+    /**
+     * Format url
+     *
+     * @param string url
+     *
+     * @return string url
+     */
+    public static function formatUrl($url)
+    {
+        $url = trim($url);
+
+        // Strip index.php
+        $url = str_replace('/index.php', '', $url);
+        $url = str_replace('/index.php5', '', $url);
+
+        return $url;
+    }
+
+    /**
+     * Parse and return main host
+     *
+     * @param string url
+     *
+     * @return string hostname
+     */
+    public static function parseUrlHost($url)
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        $parts = explode('.', $host);
+
+        $host = $parts[count($parts)-2];
+
+        return $host;
     }
 
     /**

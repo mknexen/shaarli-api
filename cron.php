@@ -152,6 +152,30 @@ class CronController
             return; // skip
         }
 
+        if ($request['info']['url'] != $feed->url) {
+            $this->verbose('Redirected to: '.$request['info']['url']);
+
+            if (Feed::parseUrlHost($request['info']['url']) == Feed::parseUrlHost($feed->url)) {
+                $this->verbose('Same host, saving change: '.$feed->url);
+
+                if (Feed::factory()->where('url', Feed::formatUrl($request['info']['url']))->count() > 0) {
+                    $this->verbose('Redirected Feed exist, disable old Feed #'.$feed->id);
+
+                    $feed->enabled = 0;
+                    $feed->error = '[ERROR SERVER REDIRECT TO AN EXISTING FEED]';
+                    $feed->save();
+
+                    return; // Skip
+                }
+
+                $feed->setUrl($request['info']['url']);
+
+                if (strpos($feed->url, 'https')) {
+                    $feed->https = 1;
+                }
+            }
+        }
+
         // Parsing feed
         $simplepie = new SimplePie();
         // $simplepie->set_cache_location( __DIR__ . '/cache/simplepie/' );
@@ -246,7 +270,13 @@ class CronController
 
         $feed->error = null;
         $feed->fetched();
-        $feed->save();
+
+        try {
+            $feed->save();
+        } catch (\PDOException $e) {
+            $this->verbose('PDO error: #'.$feed->id.' '.$e->getMessage());
+        }
+
 
         $this->getFavicon($feed);
     }

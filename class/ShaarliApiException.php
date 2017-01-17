@@ -1,3 +1,5 @@
 <?php
 
-class ShaarliApiException extends \Exception {}
+class ShaarliApiException extends \Exception
+{
+}

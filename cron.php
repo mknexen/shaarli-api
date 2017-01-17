@@ -22,11 +22,11 @@ class CronController {
 	public function check() {
 
 		try {
-			
+
 			$this->countFeeds();
 
 		} catch (Exception $e) {
-			
+
 			if( in_array($e->getCode(), array('42S02', 'HY000') )) {
 
 				$this->verbose('Empty database! Creating tables...');
@@ -36,7 +36,7 @@ class CronController {
 					if( file_exists($scheme) ) {
 						$scheme = file_get_contents( $scheme );
 						foreach(explode("-- next query", $scheme) as $query){
-							// je ne sais pas pourquoi mais avec sqlite, 
+							// je ne sais pas pourquoi mais avec sqlite,
 							// il n'y a que 1 requête d'exécuté
 							// donc je fais une boucle sur chaque requête
 							ORM::for_table('')->raw_execute( $query );
@@ -53,12 +53,12 @@ class CronController {
 				}else{
 					die("Error in config.php. DB_TYPE is not sqlite or mysql");
 				}
-				
+
 			}
 		}
 
 		try {
-			
+
 			$count = $this->countFeeds();
 
 			if( $count == 0 ) {
@@ -67,7 +67,7 @@ class CronController {
 			}
 
 		} catch (Exception $e) {
-			
+
 			$this->verbose('Unable to create tables');
 		}
 	}
@@ -100,7 +100,7 @@ class CronController {
 					->findMany();
 		}else{
 			die("Error in config.php. DB_TYPE is not sqlite or mysql");
-		}		
+		}
 
 		if( $feeds != null ) {
 
@@ -226,7 +226,15 @@ class CronController {
 
 				unset($categories, $entry_categories);
 
-				$entry->save();
+				try {
+
+					$entry->save();
+
+				} catch (\PDOException $e) {
+
+					$this->verbose('PDO error: #'.$feed->id.' '.$e->getMessage());
+				}
+
 
 				$new_entries_counter++;
 			}
@@ -286,7 +294,7 @@ class CronController {
 		else {
 
 			$feed->https = 0;
-			$feed->url = preg_replace("/^https:/", "http:", $feed->url);			
+			$feed->url = preg_replace("/^https:/", "http:", $feed->url);
 		}
 
 		$feed->save();
@@ -305,7 +313,7 @@ class CronController {
 			$favService = new Favicon();
 
 			$this->verbose('Downloading favicon for link #'. $feed->id .': ' . $feed->link);
-			
+
 			if( $favUrl = $favService->get($feed->link) ) {
 				$favRequest = $this->curl->makeRequest($favUrl);
 
@@ -314,7 +322,7 @@ class CronController {
 					file_put_contents($favicon, $favRequest['html']);
 				}
 			}
-			
+
 			if( !file_exists($favicon) || !filesize($favicon) ) {
 			    copy( FAVICON_DIRECTORY . FAVICON_DEFAULT, $favicon );
 			}
@@ -361,7 +369,7 @@ function is_php_cli() {
 if( is_php_cli() ) {
 
 	require __DIR__ . '/bootstrap.php';
-	
+
 	// Let's not break everything if new config isn't set
 	if( !defined('FAVICON_DEFAULT') ) { define('FAVICON_DEFAULT', 'default.ico'); }
 	if( !defined('FAVICON_CACHE_DURATION') ) { define('FAVICON_CACHE_DURATION', 3600*24*30); }

@@ -14,6 +14,9 @@ require $configFile;
 
 require __DIR__.'/vendor/autoload.php';
 
+// Turn off all error reporting
+error_reporting(0);
+
 /**
  * Database configuration
  * doc: http://paris.readthedocs.org/en/latest/configuration.html#setup

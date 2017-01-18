@@ -458,7 +458,7 @@ class ShaarliApi
     public function syncfeeds($nodes)
     {
         if (!empty($nodes)) {
-            $curl = new Curl();
+            $curl = new HttpClient();
 
             foreach ($nodes as $node) {
                 $content = $curl->getContent($node);
@@ -488,7 +488,7 @@ class ShaarliApi
     public function syncWithOpmlFiles($files)
     {
         if (!empty($files)) {
-            $curl = new Curl();
+            $curl = new HttpClient();
 
             foreach ($files as $file) {
                 $body = $curl->getContent($file);

@@ -14,7 +14,7 @@ class CronController
      */
     public function __construct()
     {
-        $this->curl = new Curl();
+        $this->curl = new HttpClient();
     }
 
     /**

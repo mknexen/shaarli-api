@@ -8,7 +8,7 @@ Shaarli REST API
 * # Run `composer install` (https://getcomposer.org/download/)
 * php -r "readfile('https://getcomposer.org/installer');" | php
 * php composer.phar install
-* Run: php cron.php
+* Run: php cron.php --verbose
 
 ## Requirements
 * PHP 5.4.4
@@ -20,10 +20,10 @@ Shaarli REST API
 * Update your installation via Git (`git update origin master`) or the [archive file](archive/master.zip).
 * Check if there was any changes in [config file](blob/master/config.php.dist), and add settings if necessary.
 * Update external libraries with [Composer](https://getcomposer.org/download/). Run: `composer update`.
-* Run cron the finalize the update: `php cron.php`.
+* Run cron the finalize the update: `php cron.php --verbose`.
 
 ## Install via SSH exemple (debian)
-```
+```bash
 cd /var/www
 # Clone repo
 git clone https://github.com/mknexen/shaarli-api.git

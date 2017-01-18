@@ -46,7 +46,7 @@ function shaarli_api_nodes() {
 		// Nexen
 		'https://nexen.netk.fr/shaarli-api/feeds',
 
-        // Oros (default disabled, use static OPML)
+        // Oros (default disabled, already use OPML in shaarli_opml_files() )
         // 'https://ecirtam.net/shaarli-api/feeds',
 	);
 }

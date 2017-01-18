@@ -141,7 +141,7 @@ class CronController
             }
             $feed->save();
 
-            $this->verbose('Error Fetching: ' . $feed->url);
+            $this->verbose('Error Fetching: '.$feed->url.' HTTP Code:'.$request['info']['http_code']);
 
             return; // skip
         }
@@ -154,7 +154,7 @@ class CronController
             $feed->fetched();
             $feed->save();
 
-            $this->verbose('Error Fetching: ' . $feed->url);
+            $this->verbose('Error Fetching: '.$feed->url.' Server return empty content');
 
             return; // skip
         }

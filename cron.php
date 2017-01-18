@@ -5,7 +5,7 @@ use Favicon\Favicon;
 
 class CronController
 {
-    public $verbose = true;
+    public $verbose = false;
 
     private $curl;
 
@@ -404,27 +404,30 @@ if (is_php_cli()) {
         define('FAVICON_CACHE_DURATION', 3600*24*30);
     }
 
-    if (isset($argv[1])) {
-        if ($argv[1] == '--daemon') { // daemon mode
+    if (in_array('--daemon', $argv) or in_array('-d', $argv)) { // daemon mode
 
-            while (true) {
-                $controller = new CronController();
-                $controller->verbose = false;
-                $success = $controller->fetchAll();
-                unset($controller);
-
-                if (!$success) {
-                    sleep(30);
-                }
-            }
-        } elseif ($argv[1] == '--sync') { // sync feeds
-
+        while (true) {
             $controller = new CronController();
-            $controller->syncFeeds();
+            if (in_array('--verbose', $argv) or in_array('-v', $argv)) {
+                $controller->verbose = true;
+            }
+            $success = $controller->fetchAll();
+            unset($controller);
+
+            if (!$success) {
+                sleep(30);
+            }
         }
+    } elseif (in_array('--sync', $argv)) { // sync feeds
+
+        $controller = new CronController();
+        $controller->syncFeeds();
     } else { // standard mode
 
         $controller = new CronController();
+        if (in_array('--verbose', $argv) or in_array('-v', $argv)) {
+            $controller->verbose = true;
+        }
         $controller->check();
         $controller->run();
     }

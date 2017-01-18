@@ -36,8 +36,8 @@ nano config.php
 # Run composer install
 php -r "readfile('https://getcomposer.org/installer');" | php
 php composer.phar install
-# Run cron
-php cron.php
+# Run cron, for initialization we recommend using the argument --verbose (or -v) to be sure everything working fine
+php cron.php --verbose
 ```
 
 ## API Usage

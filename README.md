@@ -14,7 +14,7 @@ Shaarli REST API
 * PHP 5.4.4
 * MySQL or Sqlite
 * PDO
-* Apache RewriteEngine or Nginx
+* Apache RewriteEngine or Nginx (see doc folder)
 
 ## Update your installation
 * Update your installation via Git (`git update origin master`) or the [archive file](archive/master.zip).
@@ -38,37 +38,6 @@ php -r "readfile('https://getcomposer.org/installer');" | php
 php composer.phar install
 # Run cron, for initialization we recommend using the argument --verbose (or -v) to be sure everything working fine
 php cron.php --verbose
-```
-
-## Nginx configuration
-```
-location /shaarli-api {
-    if (!-e $request_filename) {
-       rewrite ^(/shaarli-api)/(.*)$ $1/index.php/$2;
-    }
-}
-
-location /shaarli-api/database {
-    deny all;
-    return 403;
-}
-
-location /shaarli-api/class {
-    deny all;
-    return 403;
-}
-
-location ~ [^/]\.(php|html|htm)(/|$) {
-    fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-    if (!-f $document_root$fastcgi_script_name) {
-        return 404;
-    }
-
-    fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;
-    fastcgi_index  index.php;
-    include        fastcgi.conf;
-    fastcgi_param  PATH_INFO $fastcgi_path_info;
-}
 ```
 
 ## API Usage

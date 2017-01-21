@@ -15,7 +15,7 @@ require $configFile;
 require __DIR__.'/vendor/autoload.php';
 
 // Turn off all error reporting
-error_reporting(0);
+// error_reporting(0);
 
 /**
  * Database configuration

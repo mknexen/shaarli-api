@@ -14,7 +14,7 @@ Shaarli REST API
 * PHP 5.4.4
 * MySQL or Sqlite
 * PDO
-* Apache RewriteEngine
+* Apache RewriteEngine or Nginx (see doc folder)
 
 ## Update your installation
 * Update your installation via Git (`git update origin master`) or the [archive file](archive/master.zip).

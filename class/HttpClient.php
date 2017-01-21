@@ -9,7 +9,7 @@ class HttpClient
         'Accept-Encoding: gzip,deflate,br',
     );
 
-    public $use_curl=false; // true: use curl (if function exists), false: use file_get_contents
+    public $use_curl=true; // true: use curl (if function exists), false: use file_get_contents
 
     /**
      * Make http request and return html content

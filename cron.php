@@ -137,7 +137,7 @@ class CronController
             $feed->fetch_interval += 60;
             $feed->fetched();
             if ($feed->fetch_interval > (60*24*7)) { // Déactive le flux au bout de 7 jours
-                $feed->enable = 0;
+                $feed->enabled = 0;
             }
             $feed->save();
 
@@ -149,7 +149,7 @@ class CronController
             $feed->error = '[ERROR SERVER RETURN EMPTY CONTENT]';
             $feed->fetch_interval += 60;
             if ($feed->fetch_interval > (60*24*7)) { // Déactive le flux au bout de 7 jours
-                $feed->enable = 0;
+                $feed->enabled = 0;
             }
             $feed->fetched();
             $feed->save();
